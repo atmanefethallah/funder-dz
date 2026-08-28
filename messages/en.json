@@ -1,0 +1,117 @@
+{
+  "nav": {
+    "explore": "Places & Trails",
+    "pricing": "Pricing",
+    "login": "Log in",
+    "register": "Sign up",
+    "logout": "Log out",
+    "myAccount": "My Account",
+    "favorites": "Favorites",
+    "myDashboard": "My Dashboard",
+    "addPlace": "Add Place",
+    "discover": "Explore"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "free": "Free",
+    "currency": "DZD",
+    "loginRequired": "Login required",
+    "connectionError": "Connection error",
+    "serverError": "A server error occurred"
+  },
+  "home": {
+    "heroTitle": "Discover Smart Mostaganem",
+    "heroSubtitle": "Your tourism platform for booking the best attractions",
+    "featuredPlaces": "Featured Places",
+    "viewAll": "View All"
+  },
+  "explore": {
+    "title": "Discover Smart Mostaganem",
+    "aiPlanner": "AI Planner",
+    "resultsFound": "verified destinations",
+    "noResults": "No matching results",
+    "startRoute": "Start Route",
+    "freeEntry": "Free Entry",
+    "new": "New"
+  },
+  "booking": {
+    "bookWithDeposit": "Book with deposit (10%)",
+    "booking": "Booking...",
+    "confirmTitle": "Confirm Booking with Deposit",
+    "confirmFreeTitle": "Confirm Free Booking",
+    "successTitle": "Booking Successful!",
+    "payDeposit": "Pay Deposit",
+    "confirmBooking": "Confirm Booking",
+    "cancel": "Cancel"
+  },
+  "wallet": {
+    "title": "Wallet",
+    "currentBalance": "Current Balance",
+    "topUp": "Instant Top-Up",
+    "topUpPlaceholder": "Enter Funder voucher code",
+    "confirmTopUp": "Confirm Top-Up",
+    "transactions": "Transaction History",
+    "noTransactions": "No transactions yet",
+    "voucherTopup": "Voucher top-up",
+    "rechargeTopup": "Receipt top-up",
+    "bookingDeposit": "Booking deposit",
+    "bookingRefund": "Deposit refund",
+    "partnerEarning": "Booking earnings",
+    "howToTopUp": "How do I top up?"
+  },
+  "tickets": {
+    "title": "My Tickets & Bookings",
+    "subtitle": "Show the QR code at the entrance gate",
+    "noTickets": "You haven't booked any tickets yet",
+    "status": {
+      "PENDING": "Pending",
+      "CONFIRMED": "Confirmed",
+      "REJECTED": "Rejected",
+      "USED": "Used"
+    }
+  },
+  "reviews": {
+    "rateYourExperience": "Rate Your Experience",
+    "writeComment": "Write a comment about the place... (optional)",
+    "submit": "Submit Review",
+    "sending": "Sending...",
+    "thanks": "Thanks for your review!",
+    "selectStars": "Please select a star rating"
+  },
+  "pricing": {
+    "title": "Choose Your Perfect Plan",
+    "subtitle": "Whether you're a tourist exploring or a partner managing attractions, we have a plan for your ambition",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "saveTwoMonths": "Save 2 months",
+    "currentPlan": "Your Current Plan",
+    "subscribeNow": "Subscribe Now",
+    "mostPopular": "Most Popular",
+    "partnerPlans": "Partner Plans",
+    "touristPlans": "Tourist Plans",
+    "freePlan": "Free Plan",
+    "upgrade": "Upgrade"
+  },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit Profile",
+    "name": "Name",
+    "phone": "Phone Number",
+    "email": "Email",
+    "tourist": "Tourist",
+    "partner": "Promoter Partner",
+    "admin": "Platform Admin",
+    "deleteTicket": "Delete ticket permanently",
+    "logoutConfirm": "Are you sure you want to log out?"
+  }
+}

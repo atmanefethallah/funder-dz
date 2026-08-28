@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #111827;
+}
+
+/* 🌙 متغيرات الوضع الليلي */
+.dark {
+  --background: #0b1220;
+  --foreground: #e5e7eb;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ============================================================
+   🌙 الوضع الليلي — إعادة تعيين الأسطح والنصوص والحدود الشائعة
+   (نهج عملي يغطي التطبيق دون إعادة كتابة كل مكوّن)
+   ============================================================ */
+
+/* الخلفيات الفاتحة → داكنة */
+.dark .bg-white { background-color: #0f172a; }
+.dark .bg-gray-50 { background-color: #0b1220; }
+.dark .bg-gray-100 { background-color: #1e293b; }
+.dark .bg-gray-50\/50 { background-color: rgba(11, 18, 32, 0.6); }
+.dark .bg-white\/80 { background-color: rgba(15, 23, 42, 0.85); }
+
+/* النصوص الداكنة → فاتحة */
+.dark .text-gray-900 { color: #f1f5f9; }
+.dark .text-gray-800 { color: #e2e8f0; }
+.dark .text-gray-700 { color: #cbd5e1; }
+.dark .text-gray-600 { color: #94a3b8; }
+.dark .text-gray-500 { color: #94a3b8; }
+.dark .text-gray-400 { color: #64748b; }
+
+/* الحدود */
+.dark .border-gray-100,
+.dark .border-gray-200,
+.dark .border-gray-300 { border-color: #334155; }
+.dark .border { border-color: #334155; }
+
+/* أسطح ملوّنة فاتحة → نسخ داكنة */
+.dark .bg-blue-50 { background-color: #17294a; }
+.dark .bg-green-50 { background-color: #10281c; }
+.dark .bg-red-50 { background-color: #2b1518; }
+.dark .bg-amber-50 { background-color: #2b2113; }
+.dark .bg-amber-100 { background-color: #3a2c14; }
+.dark .bg-yellow-50 { background-color: #2b2513; }
+.dark .bg-indigo-100 { background-color: #1e2452; }
+
+/* حقول الإدخال في الوضع الليلي */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  border-color: #334155;
+}
+.dark input::placeholder,
+.dark textarea::placeholder { color: #64748b; }
+
+/* الظلال أخف في الداكن */
+.dark .shadow-sm,
+.dark .shadow,
+.dark .shadow-md,
+.dark .shadow-lg,
+.dark .shadow-xl { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); }

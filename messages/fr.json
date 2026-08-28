@@ -1,0 +1,117 @@
+{
+  "nav": {
+    "explore": "Sites & Circuits",
+    "pricing": "Tarifs",
+    "login": "Connexion",
+    "register": "Créer un compte",
+    "logout": "Déconnexion",
+    "myAccount": "Mon Compte",
+    "favorites": "Favoris",
+    "myDashboard": "Mon Tableau",
+    "addPlace": "Ajouter un site",
+    "discover": "Explorer"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "search": "Rechercher",
+    "free": "Gratuit",
+    "currency": "DZD",
+    "loginRequired": "Connexion requise",
+    "connectionError": "Erreur de connexion",
+    "serverError": "Une erreur serveur est survenue"
+  },
+  "home": {
+    "heroTitle": "Découvrez Mostaganem Intelligente",
+    "heroSubtitle": "Votre plateforme touristique pour réserver les meilleurs sites",
+    "featuredPlaces": "Sites en vedette",
+    "viewAll": "Voir tout"
+  },
+  "explore": {
+    "title": "Découvrez Mostaganem Intelligente",
+    "aiPlanner": "Planificateur IA",
+    "resultsFound": "destinations vérifiées",
+    "noResults": "Aucun résultat correspondant",
+    "startRoute": "Démarrer l'itinéraire",
+    "freeEntry": "Entrée gratuite",
+    "new": "Nouveau"
+  },
+  "booking": {
+    "bookWithDeposit": "Réserver avec acompte (10%)",
+    "booking": "Réservation...",
+    "confirmTitle": "Confirmer la réservation avec acompte",
+    "confirmFreeTitle": "Confirmer la réservation gratuite",
+    "successTitle": "Réservation réussie!",
+    "payDeposit": "Payer l'acompte",
+    "confirmBooking": "Confirmer la réservation",
+    "cancel": "Annuler"
+  },
+  "wallet": {
+    "title": "Portefeuille",
+    "currentBalance": "Solde actuel",
+    "topUp": "Recharge instantanée",
+    "topUpPlaceholder": "Entrez le code du coupon Funder",
+    "confirmTopUp": "Confirmer la recharge",
+    "transactions": "Historique des transactions",
+    "noTransactions": "Aucune transaction pour le moment",
+    "voucherTopup": "Recharge par coupon",
+    "rechargeTopup": "Recharge par reçu",
+    "bookingDeposit": "Acompte de réservation",
+    "bookingRefund": "Remboursement d'acompte",
+    "partnerEarning": "Gains de réservation",
+    "howToTopUp": "Comment recharger mon solde?"
+  },
+  "tickets": {
+    "title": "Mes Billets & Réservations",
+    "subtitle": "Présentez le code QR à l'entrée",
+    "noTickets": "Vous n'avez encore réservé aucun billet",
+    "status": {
+      "PENDING": "En attente",
+      "CONFIRMED": "Confirmé",
+      "REJECTED": "Rejeté",
+      "USED": "Utilisé"
+    }
+  },
+  "reviews": {
+    "rateYourExperience": "Évaluez votre expérience",
+    "writeComment": "Écrivez un commentaire sur le lieu... (facultatif)",
+    "submit": "Envoyer l'avis",
+    "sending": "Envoi...",
+    "thanks": "Merci pour votre avis!",
+    "selectStars": "Veuillez sélectionner une note"
+  },
+  "pricing": {
+    "title": "Choisissez votre forfait idéal",
+    "subtitle": "Que vous soyez un touriste ou un partenaire, nous avons un forfait adapté à votre ambition",
+    "monthly": "Mensuel",
+    "yearly": "Annuel",
+    "saveTwoMonths": "2 mois offerts",
+    "currentPlan": "Votre forfait actuel",
+    "subscribeNow": "S'abonner",
+    "mostPopular": "Le plus populaire",
+    "partnerPlans": "Forfaits Partenaires",
+    "touristPlans": "Forfaits Touristes",
+    "freePlan": "Forfait Gratuit",
+    "upgrade": "Améliorer"
+  },
+  "profile": {
+    "title": "Profil",
+    "editProfile": "Modifier le profil",
+    "name": "Nom",
+    "phone": "Numéro de téléphone",
+    "email": "E-mail",
+    "tourist": "Touriste",
+    "partner": "Partenaire promoteur",
+    "admin": "Administrateur",
+    "deleteTicket": "Supprimer définitivement le billet",
+    "logoutConfirm": "Êtes-vous sûr de vouloir vous déconnecter?"
+  }
+}

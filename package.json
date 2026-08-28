@@ -1,0 +1,50 @@
+{
+  "name": "funder-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:seed": "node prisma/seed.js",
+    "db:migrate:p0": "psql \"$DIRECT_URL\" -f prisma/migrations/0001_p0_security_hardening/migration.sql"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "@tailwindcss/postcss": "^4.3.0",
+    "@yudiel/react-qr-scanner": "^2.6.0",
+    "autoprefixer": "^10.5.0",
+    "bcryptjs": "^2.4.3",
+    "html-to-image": "^1.11.13",
+    "html2canvas": "^1.4.1",
+    "html5-qrcode": "^2.3.8",
+    "jsqr": "^1.4.0",
+    "leaflet": "^1.9.4",
+    "leaflet-defaulticon-compatibility": "^0.1.2",
+    "lucide-react": "^0.360.0",
+    "next": "14.2.0",
+    "next-auth": "^4.24.7",
+    "next-intl": "^3.10.0",
+    "pg": "^8.11.5",
+    "qrcode.react": "^3.2.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-leaflet": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/leaflet": "^1.9.21",
+    "@types/node": "^20",
+    "@types/pg": "^8.11.6",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "dotenv": "^16.4.5",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.0",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.19",
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
+  }
+}

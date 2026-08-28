@@ -1,0 +1,117 @@
+{
+  "nav": {
+    "explore": "المعالم والمسالك",
+    "pricing": "الباقات",
+    "login": "دخول",
+    "register": "حساب جديد",
+    "logout": "خروج",
+    "myAccount": "حسابي",
+    "favorites": "مفضلتي",
+    "myDashboard": "لوحتي",
+    "addPlace": "إضافة معلم",
+    "discover": "استكشاف"
+  },
+  "common": {
+    "loading": "جاري التحميل...",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "close": "إغلاق",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "search": "بحث",
+    "free": "مجاني",
+    "currency": "د.ج",
+    "loginRequired": "تسجيل الدخول مطلوب",
+    "connectionError": "خطأ في الاتصال",
+    "serverError": "حدث خطأ في الخادم"
+  },
+  "home": {
+    "heroTitle": "اكتشف مستغانم الذكية",
+    "heroSubtitle": "منصتك السياحية لحجز أفضل المعالم",
+    "featuredPlaces": "معالم مميزة",
+    "viewAll": "عرض الكل"
+  },
+  "explore": {
+    "title": "اكتشف مستغانم الذكية",
+    "aiPlanner": "التخطيط بالـ AI",
+    "resultsFound": "وجهة سياحية معتمدة",
+    "noResults": "لا توجد نتائج مطابقة",
+    "startRoute": "بدء المسار",
+    "freeEntry": "دخول مجاني",
+    "new": "جديد"
+  },
+  "booking": {
+    "bookWithDeposit": "حجز بعربون (10%)",
+    "booking": "جاري الحجز...",
+    "confirmTitle": "تأكيد الحجز بالعربون",
+    "confirmFreeTitle": "تأكيد الحجز المجاني",
+    "successTitle": "تم الحجز بنجاح!",
+    "payDeposit": "ادفع العربون",
+    "confirmBooking": "تأكيد الحجز",
+    "cancel": "تراجع"
+  },
+  "wallet": {
+    "title": "المحفظة",
+    "currentBalance": "الرصيد الحالي",
+    "topUp": "شحن الرصيد الفوري",
+    "topUpPlaceholder": "أدخل رمز قسيمة فندر",
+    "confirmTopUp": "تأكيد الشحن",
+    "transactions": "سجل العمليات",
+    "noTransactions": "لا توجد عمليات بعد",
+    "voucherTopup": "شحن بقسيمة",
+    "rechargeTopup": "شحن عبر وصل",
+    "bookingDeposit": "عربون حجز",
+    "bookingRefund": "استرداد عربون",
+    "partnerEarning": "أرباح من حجز",
+    "howToTopUp": "كيف أشحن رصيدي؟"
+  },
+  "tickets": {
+    "title": "تذاكري وحجوزاتي",
+    "subtitle": "أظهر رمز الـ QR عند بوابة الدخول",
+    "noTickets": "لم تقم بحجز أي تذاكر بعد",
+    "status": {
+      "PENDING": "قيد الانتظار",
+      "CONFIRMED": "مؤكدة",
+      "REJECTED": "مرفوضة",
+      "USED": "مستخدمة"
+    }
+  },
+  "reviews": {
+    "rateYourExperience": "قيّم تجربتك",
+    "writeComment": "اكتب تعليقاً عن المكان... (اختياري)",
+    "submit": "إرسال التقييم",
+    "sending": "جاري الإرسال...",
+    "thanks": "شكراً لتقييمك!",
+    "selectStars": "يرجى تحديد عدد النجوم"
+  },
+  "pricing": {
+    "title": "اختر باقتك المثالية",
+    "subtitle": "سواء كنت سائحاً يستكشف أو شريكاً يدير معالم، لدينا باقة تناسب طموحك",
+    "monthly": "شهري",
+    "yearly": "سنوي",
+    "saveTwoMonths": "وفّر شهرين",
+    "currentPlan": "باقتك الحالية",
+    "subscribeNow": "اشترك الآن",
+    "mostPopular": "الأكثر شيوعاً",
+    "partnerPlans": "باقات الشركاء",
+    "touristPlans": "باقات السياح",
+    "freePlan": "الباقة المجانية",
+    "upgrade": "ترقَّ"
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "editProfile": "تعديل البيانات",
+    "name": "الاسم",
+    "phone": "رقم الهاتف",
+    "email": "البريد الإلكتروني",
+    "tourist": "سائح",
+    "partner": "شريك مروّج",
+    "admin": "مدير المنصة",
+    "deleteTicket": "حذف التذكرة نهائياً",
+    "logoutConfirm": "هل أنت متأكد أنك تريد تسجيل الخروج؟"
+  }
+}
