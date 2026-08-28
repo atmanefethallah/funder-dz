@@ -27,7 +27,7 @@ export async function POST(request: Request) {
 
     const parsedAmount = Number(amount);
     if (!amount || !Number.isFinite(parsedAmount) || parsedAmount <= 0 || parsedAmount > 10_000_000) {
-      return NextResponse.json({ message: "مبلग الشحن गير صالح" }, { status: 400 });
+      return NextResponse.json({ message: "مبلغ الشحن غير صالح" }, { status: 400 });
     }
 
     if (!transactionId || transactionId.trim() === "") {

@@ -12,13 +12,13 @@ export async function POST(request: Request) {
     const body = await request.json().catch(() => null);
     const placeId = body?.placeId;
     if (!placeId || typeof placeId !== "string") {
-      return NextResponse.json({ message: "معرف المعلم गير صالح" }, { status: 400 });
+      return NextResponse.json({ message: "معرف المعلم غير صالح" }, { status: 400 });
     }
 
     // تأكد أن المعلم موجود فعلاً
     const place = await queryOne<{ id: string }>(`SELECT "id" FROM "Place" WHERE "id" = $1`, [placeId]);
     if (!place) {
-      return NextResponse.json({ message: "المعلم गير موجود" }, { status: 404 });
+      return NextResponse.json({ message: "المعلم غير موجود" }, { status: 404 });
     }
 
     const existing = await queryOne<{ id: string }>(

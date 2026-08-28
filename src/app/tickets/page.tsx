@@ -52,7 +52,7 @@ export default async function MyTicketsPage() {
 
       {tickets.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-12 text-center text-gray-500 font-medium">
-          لم تقم بحجز أي تذاكر بعد. استكشف المعالم المتاحة في مستगانم وبادر بالحجز! 🌟
+          لم تقم بحجز أي تذاكر بعد. استكشف المعالم المتاحة في مستغانم وبادر بالحجز! 🌟
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">

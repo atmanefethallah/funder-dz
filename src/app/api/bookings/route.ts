@@ -35,14 +35,14 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => null);
     const placeId = body?.placeId;
     if (!placeId || typeof placeId !== "string") {
-      return NextResponse.json({ message: "معرف المعلم गير صالح" }, { status: 400 });
+      return NextResponse.json({ message: "معرف المعلم غير صالح" }, { status: 400 });
     }
 
     // 4. معاملة ذرّية: كل العمليات تنجح معاً أو تفشل معاً
     await withTransaction(async (tx) => {
       const placeRes = await tx.query<PlaceRow>(`SELECT "id", "name", "price", "userId" FROM "Place" WHERE "id" = $1`, [placeId]);
       const place = placeRes.rows[0];
-      if (!place) throw new Error("المعلم गير موجود");
+      if (!place) throw new Error("المعلم غير موجود");
 
       // منع تكرار حجز نشط لنفس المعلم من نفس المستخدم
       const existingActiveRes = await tx.query(
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
           [deposit, sessionUser.id],
         );
         if (debitedRes.rowCount === 0) {
-          throw new Error("رصيدك गير كافِ لإتمام هذا الحجز. يرجى شحن محفظتك أولاً.");
+          throw new Error("رصيدك غير كافِ لإتمام هذا الحجز. يرجى شحن محفظتك أولاً.");
         }
 
         await recordLedger(tx, {
@@ -100,7 +100,7 @@ export async function POST(req: Request) {
         [
           place.userId,
           "🔔 طلب حجز جديد!",
-          `دفع السائح "${sessionUser.name || "مستخدم"}" عربوناً لطلب حجز في "${place.name}". اضगط هنا لمراجعة الطلب.`,
+          `دفع السائح "${sessionUser.name || "مستخدم"}" عربوناً لطلب حجز في "${place.name}". اضغط هنا لمراجعة الطلب.`,
           "/partner/bookings",
         ],
       );
@@ -111,8 +111,8 @@ export async function POST(req: Request) {
     const err = error as { message?: string };
     const errorMessage = err?.message || "حدث خطأ في الخادم";
     const isClientError =
-      errorMessage.includes("गير موجود") ||
-      errorMessage.includes("गير كاف") ||
+      errorMessage.includes("غير موجود") ||
+      errorMessage.includes("غير كاف") ||
       errorMessage.includes("حجز نشط");
     return NextResponse.json({ message: errorMessage }, { status: isClientError ? 400 : 500 });
   }

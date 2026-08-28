@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   try {
     const sessionUser = await getSessionUser();
     if (!sessionUser) {
-      return NextResponse.json({ message: "गير مصرح لك" }, { status: 401 });
+      return NextResponse.json({ message: "غير مصرح لك" }, { status: 401 });
     }
 
     const rl = rateLimit(`verify:${sessionUser.id}`, 5, 60 * 60 * 1000);
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     const maxSize = 5 * 1024 * 1024;
     if (registryFile.size > maxSize || idCardFile.size > maxSize) {
       return NextResponse.json(
-        { message: "❌ حجم أي ملف يجب ألا يتجاوز 5 ميगابايت." },
+        { message: "❌ حجم أي ملف يجب ألا يتجاوز 5 ميغابايت." },
         { status: 400 }
       );
     }
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Verification Upload Error:", error);
     return NextResponse.json(
-      { message: "حدث خطأ गير متوقع أثناء رفع الوثائق" },
+      { message: "حدث خطأ غير متوقع أثناء رفع الوثائق" },
       { status: 500 }
     );
   }

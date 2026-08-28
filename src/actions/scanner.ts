@@ -16,15 +16,15 @@ type ScannedBookingRow = {
 
 export async function validateTicket(scannedData: string) {
   try {
-    // 🛡️ كان هذا الإجراء بلا مصادقة سابقاً — أगلق الآن: شركاء فقط
+    // 🛡️ كان هذا الإجراء بلا مصادقة سابقاً — أغلق الآن: شركاء فقط
     const sessionUser = await requireRole("PARTNER", "ADMIN");
     if (!sessionUser) {
-      return { success: false, message: "गير مصرح — الماسح للشركاء فقط." };
+      return { success: false, message: "غير مصرح — الماسح للشركاء فقط." };
     }
 
     const token = (scannedData || "").trim();
     if (!token) {
-      return { success: false, message: "رمز ممسوح فارग." };
+      return { success: false, message: "رمز ممسوح فارغ." };
     }
 
     // البحث برمز QR السري (qrToken) وليس بمعرّف الحجز القابل للتخمين
@@ -40,7 +40,7 @@ export async function validateTicket(scannedData: string) {
     );
 
     if (!booking) {
-      return { success: false, message: "❌ التذكرة गير صالحة أو गير موجودة في النظام." };
+      return { success: false, message: "❌ التذكرة غير صالحة أو غير موجودة في النظام." };
     }
 
     // التذكرة تخص معالم هذا الشريك فقط (المدير مستثنى)
@@ -69,7 +69,7 @@ export async function validateTicket(scannedData: string) {
       return { success: false, message: "⚠️ تم مسح هذه التذكرة للتو من جهاز آخر!" };
     }
 
-    // المبلग المتبقي للتحصيل نقداً عند البوابة
+    // المبلغ المتبقي للتحصيل نقداً عند البوابة
     const remainingAmount = Math.max(Number(booking.place_price) - Number(booking.amount), 0);
 
     return {

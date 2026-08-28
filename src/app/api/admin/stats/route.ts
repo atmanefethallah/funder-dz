@@ -13,7 +13,7 @@ type BookingStatsRow = {
 export async function GET() {
   try {
     const admin = await requireRole("ADMIN");
-    if (!admin) return NextResponse.json({ message: "गير مصرح" }, { status: 403 });
+    if (!admin) return NextResponse.json({ message: "غير مصرح" }, { status: 403 });
 
     const usersCountRow = await queryOne<{ count: string }>(`SELECT COUNT(*)::text AS count FROM "User"`);
     const placesCountRow = await queryOne<{ count: string }>(`SELECT COUNT(*)::text AS count FROM "Place"`);

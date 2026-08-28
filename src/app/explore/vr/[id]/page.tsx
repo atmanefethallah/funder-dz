@@ -31,7 +31,7 @@ export default async function VRTourPage({ params }: { params: { id: string } })
             <ArrowRight size={18} /> العودة للمعالم
           </Link>
           <div className="flex items-center gap-2 text-yellow-400 bg-yellow-400/10 px-4 py-1.5 rounded-full border border-yellow-400/20 text-xs font-bold">
-            <Compass size={14} className="animate-spin" style={{ animationDuration: '6s' }} /> وضع التجول الगامر
+            <Compass size={14} className="animate-spin" style={{ animationDuration: '6s' }} /> وضع التجول الغامر
           </div>
         </div>
 
@@ -41,13 +41,13 @@ export default async function VRTourPage({ params }: { params: { id: string } })
           <p className="text-gray-400 text-sm max-w-2xl">{place.description}</p>
         </div>
 
-        {/* عرض مشगل الـ 360 درجة الخارق */}
+        {/* عرض مشغل الـ 360 درجة الخارق */}
         <VRViewer imageUrl={final360Url} title={place.name} />
 
       </div>
       
       <div className="text-center text-xs text-gray-600 font-bold mt-8">
-        منصة Funder © جميع الحقوق محفوظة لولاية مستगانم الرقمية
+        منصة Funder © جميع الحقوق محفوظة لولاية مستغانم الرقمية
       </div>
     </div>
   );

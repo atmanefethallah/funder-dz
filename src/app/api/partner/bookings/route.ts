@@ -21,7 +21,7 @@ export async function GET() {
   try {
     const sessionUser = await requireRole("PARTNER", "ADMIN");
     if (!sessionUser) {
-      return NextResponse.json({ message: "गير مصرح" }, { status: 403 });
+      return NextResponse.json({ message: "غير مصرح" }, { status: 403 });
     }
 
     const rows = await query<PartnerBookingRow>(
@@ -62,7 +62,7 @@ export async function PUT(request: Request) {
     const sessionUser = await requireRole("PARTNER", "ADMIN");
     if (!sessionUser) {
       return NextResponse.json(
-        { message: "गير مصرح — هذه العملية للشركاء فقط" },
+        { message: "غير مصرح — هذه العملية للشركاء فقط" },
         { status: 403 }
       );
     }
@@ -72,7 +72,7 @@ export async function PUT(request: Request) {
     const action = body?.action;
 
     if (!bookingId || !["CONFIRMED", "REJECTED"].includes(action)) {
-      return NextResponse.json({ message: "طلب गير صالح" }, { status: 400 });
+      return NextResponse.json({ message: "طلب غير صالح" }, { status: 400 });
     }
 
     const booking = await queryOne<{
@@ -91,7 +91,7 @@ export async function PUT(request: Request) {
       [bookingId],
     );
     if (!booking) {
-      return NextResponse.json({ message: "الحجز गير موجود" }, { status: 404 });
+      return NextResponse.json({ message: "الحجز غير موجود" }, { status: 404 });
     }
 
     if (sessionUser.role !== "ADMIN" && booking.place_userId !== sessionUser.id) {
@@ -152,13 +152,13 @@ export async function PUT(request: Request) {
         [
           booking.userId,
           "❌ تعذر قبول طلب حجزك",
-          `عذراً، رفض الشريك طلب الحجز في "${booking.place_name}". تمت إعادة مبلग العربون (${amount} د.ج) إلى محفظتك.`,
+          `عذراً، رفض الشريك طلب الحجز في "${booking.place_name}". تمت إعادة مبلغ العربون (${amount} د.ج) إلى محفظتك.`,
           "/profile",
         ],
       );
     });
 
-    return NextResponse.json({ message: "تم رفض الحجز وإعادة المبلग إلى محفظة السائح بنجاح." });
+    return NextResponse.json({ message: "تم رفض الحجز وإعادة المبلغ إلى محفظة السائح بنجاح." });
   } catch (error) {
     console.error("PUT Partner Bookings Error:", error);
     return NextResponse.json(

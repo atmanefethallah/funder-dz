@@ -18,7 +18,7 @@ type PendingPartnerRow = {
 export async function GET() {
   try {
     const admin = await requireRole("ADMIN");
-    if (!admin) return NextResponse.json({ message: "गير مصرح" }, { status: 403 });
+    if (!admin) return NextResponse.json({ message: "غير مصرح" }, { status: 403 });
 
     const pendingPartners = await query<PendingPartnerRow>(
       `SELECT "id", "name", "email", "phone", "commercialRegistry", "idCard", "createdAt"
@@ -36,14 +36,14 @@ export async function GET() {
 export async function PUT(req: Request) {
   try {
     const admin = await requireRole("ADMIN");
-    if (!admin) return NextResponse.json({ message: "गير مصرح" }, { status: 403 });
+    if (!admin) return NextResponse.json({ message: "غير مصرح" }, { status: 403 });
 
     const body = await req.json().catch(() => null);
     const userId = body?.userId;
     const action = body?.action;
 
     if (!userId || !["APPROVE", "REJECT"].includes(action)) {
-      return NextResponse.json({ message: "طلب गير صالح" }, { status: 400 });
+      return NextResponse.json({ message: "طلب غير صالح" }, { status: 400 });
     }
 
     const target = await queryOne<{ id: string; verificationStatus: string }>(
@@ -51,7 +51,7 @@ export async function PUT(req: Request) {
       [userId],
     );
     if (!target) {
-      return NextResponse.json({ message: "المستخدم गير موجود" }, { status: 404 });
+      return NextResponse.json({ message: "المستخدم غير موجود" }, { status: 404 });
     }
 
     if (action === "APPROVE") {
@@ -74,7 +74,7 @@ export async function PUT(req: Request) {
       return NextResponse.json({ message: "✅ تم تفعيل حساب الشريك وإرسال الإشعار بنجاح!" });
     }
 
-    // REJECT — إعادة الحساب للحالة गير الموثقة وتصفير الوثائق لإتاحة الرفع مجدداً
+    // REJECT — إعادة الحساب للحالة غير الموثقة وتصفير الوثائق لإتاحة الرفع مجدداً
     await withTransaction(async (tx) => {
       await tx.query(
         `UPDATE "User" SET "verificationStatus" = 'UNVERIFIED', "isVerified" = false, "commercialRegistry" = NULL, "idCard" = NULL WHERE "id" = $1`,

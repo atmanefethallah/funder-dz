@@ -10,7 +10,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   try {
     const sessionUser = await getSessionUser();
     if (!sessionUser) {
-      return NextResponse.json({ message: "गير مصرح" }, { status: 401 });
+      return NextResponse.json({ message: "غير مصرح" }, { status: 401 });
     }
 
     const booking = await queryOne<BookingRow>(
@@ -20,7 +20,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 
     if (!booking || booking.userId !== sessionUser.id) {
       return NextResponse.json(
-        { message: "التذكرة गير موجودة أو لا تملك صلاحية حذفها." },
+        { message: "التذكرة غير موجودة أو لا تملك صلاحية حذفها." },
         { status: 403 }
       );
     }

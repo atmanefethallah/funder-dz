@@ -5,7 +5,7 @@ const RoutesMap = dynamic(() => import('@/components/map/RoutesMap'), {
   ssr: false,
   loading: () => (
     <div className="flex h-[600px] w-full items-center justify-center rounded-2xl bg-gray-100 animate-pulse">
-      <p className="text-lg font-semibold text-gray-500">جاري تحميل مسالك مستगانم...</p>
+      <p className="text-lg font-semibold text-gray-500">جاري تحميل مسالك مستغانم...</p>
     </div>
   ),
 });
@@ -37,7 +37,7 @@ export default async function MapPage() {
         <div>
           <h1 className="text-3xl font-extrabold text-gray-900">المسالك السياحية</h1>
           <p className="mt-2 text-gray-600">
-            تصفح الخريطة التفاعلية لاكتشاف المعالم والمسالك الخمسة بولاية مستगانم.
+            تصفح الخريطة التفاعلية لاكتشاف المعالم والمسالك الخمسة بولاية مستغانم.
           </p>
         </div>
         

@@ -70,11 +70,11 @@ export default async function WishlistPage() {
           </div>
         </div>
 
-        {/* إذا كانت المفضلة فارगة */}
+        {/* إذا كانت المفضلة فارغة */}
         {savedItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-gray-200 py-24 text-center bg-white shadow-sm">
             <Heart size={64} className="mb-4 text-gray-300" />
-            <p className="text-xl font-bold text-gray-700 mb-2">مفضلتك فارगة تماماً</p>
+            <p className="text-xl font-bold text-gray-700 mb-2">مفضلتك فارغة تماماً</p>
             <p className="text-sm text-gray-500 mb-6">لم تقم بإضافة أي معالم إلى مفضلتك بعد.</p>
             <Link href="/explore" className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-bold text-white transition hover:bg-blue-700 shadow-md">
               <Compass size={20} /> استكشف المعالم الآن

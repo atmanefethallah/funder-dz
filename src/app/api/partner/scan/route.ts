@@ -17,13 +17,13 @@ export async function POST(request: Request) {
   try {
     const sessionUser = await requireRole("PARTNER", "ADMIN");
     if (!sessionUser) {
-      return NextResponse.json({ message: "गير مصرح لك" }, { status: 403 });
+      return NextResponse.json({ message: "غير مصرح لك" }, { status: 403 });
     }
 
     const body = await request.json().catch(() => null);
     const qrToken = typeof body?.qrToken === "string" ? body.qrToken.trim() : "";
     if (!qrToken) {
-      return NextResponse.json({ message: "رمز QR فارग" }, { status: 400 });
+      return NextResponse.json({ message: "رمز QR فارغ" }, { status: 400 });
     }
 
     // البحث برمز QR السري وليس بمعرّف الحجز القابل للتخمين
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     );
 
     if (!booking) {
-      return NextResponse.json({ message: "❌ رمز QR गير صالح أو مزيف!" }, { status: 404 });
+      return NextResponse.json({ message: "❌ رمز QR غير صالح أو مزيف!" }, { status: 404 });
     }
 
     if (sessionUser.role !== "ADMIN" && booking.place_userId !== sessionUser.id) {
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     }
 
     if (booking.status !== "CONFIRMED") {
-      return NextResponse.json({ message: "⚠️ التذكرة गير مؤكدة بعد!" }, { status: 400 });
+      return NextResponse.json({ message: "⚠️ التذكرة غير مؤكدة بعد!" }, { status: 400 });
     }
 
     // 🛡️ استهلاك ذرّي: التحديث ينجح فقط إذا كانت الحالة ما تزال CONFIRMED

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import OnboardingTour from "@/components/OnboardingTour";
-import nextDynamic from "next/dynamic"; // 👈 قمنا بتगيير الاسم هنا إلى nextDynamic لحل التعارض
+import nextDynamic from "next/dynamic"; // 👈 قمنا بتغيير الاسم هنا إلى nextDynamic لحل التعارض
 import { Compass, Sparkles, Map, QrCode, Glasses, ShieldCheck, LayoutDashboard, LogIn } from "lucide-react";
 import { query } from "@/lib/db";
 import { getSessionUser } from "@/lib/session";
@@ -69,7 +69,7 @@ export default async function HomePage() {
         </div>
 
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-blue-600 font-bold text-sm mb-8 shadow-sm">
-          <Sparkles size={16} className="animate-pulse" /> المنصة السياحية الرائدة في مستगانم وقريباً كل الجزائر
+          <Sparkles size={16} className="animate-pulse" /> المنصة السياحية الرائدة في مستغانم وقريباً كل الجزائر
         </div>
 
         <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-6 leading-tight max-w-4xl">
@@ -77,10 +77,10 @@ export default async function HomePage() {
         </h1>
         
         <p className="text-lg md:text-xl text-gray-600 mb-10 max-w-2xl leading-relaxed">
-          دليلك الرقمي الشامل. احجز تذاكرك بضगطة زر، استكشف المعالم عبر الخريطة التفاعلية، وعِش تجربة الواقع المعزز 360° كأنك هناك!
+          دليلك الرقمي الشامل. احجز تذاكرك بضغطة زر، استكشف المعالم عبر الخريطة التفاعلية، وعِش تجربة الواقع المعزز 360° كأنك هناك!
         </p>
 
-        {/* 🎛️ أزرار التوجيه الديناميكية (تتगير حسب تسجيل الدخول والدور) */}
+        {/* 🎛️ أزرار التوجيه الديناميكية (تتغير حسب تسجيل الدخول والدور) */}
         <div className="flex flex-col items-center gap-4 w-full justify-center">
           {user ? (
             // ✅ واجهة المستخدم المسجل
@@ -140,7 +140,7 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">لماذا منصة Funder؟</h2>
-            <p className="text-gray-500 max-w-xl mx-auto">جمعنا لك أحدथ التقنيات العالمية لنقدم لك تجربة سياحية لا تُنسى.</p>
+            <p className="text-gray-500 max-w-xl mx-auto">جمعنا لك أحدث التقنيات العالمية لنقدم لك تجربة سياحية لا تُنسى.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -156,8 +156,8 @@ export default async function HomePage() {
             </div>
             <div className="flex flex-col items-center text-center p-6 rounded-3xl bg-gray-50 border border-gray-100 hover:-translate-y-2 transition-transform duration-300">
               <div className="w-16 h-16 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm"><Glasses size={32} /></div>
-              <h3 className="text-xl font-bold text-gray-800 mb-3">جولات 360° गامرة</h3>
-              <p className="text-gray-500 text-sm">تجوّل داخل القلاع، المتاحف، والगابات افتراضياً قبل زيارتها على أرض الواقع.</p>
+              <h3 className="text-xl font-bold text-gray-800 mb-3">جولات 360° غامرة</h3>
+              <p className="text-gray-500 text-sm">تجوّل داخل القلاع، المتاحف، والغابات افتراضياً قبل زيارتها على أرض الواقع.</p>
             </div>
             <div className="flex flex-col items-center text-center p-6 rounded-3xl bg-gray-50 border border-gray-100 hover:-translate-y-2 transition-transform duration-300">
               <div className="w-16 h-16 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm"><ShieldCheck size={32} /></div>

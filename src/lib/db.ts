@@ -18,7 +18,7 @@ declare global {
 function createPool(): Pool {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
-    throw new Error("DATABASE_URL गير مضبوط في متطيرات البيئة.");
+    throw new Error("DATABASE_URL غير مضبوط في متطيرات البيئة.");
   }
   return new Pool({
     connectionString,

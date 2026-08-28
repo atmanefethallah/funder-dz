@@ -5,9 +5,9 @@ import { queryOne } from "@/lib/db";
 import bcrypt from "bcryptjs";
 
 // ⚠️ تحذير فقط أثناء البناء — لا نرمي خطأً عند الاستيراد حتى لا يتعطل
-// "Collecting page data". NextAuth نفسه يفرض NEXTAUTH_SECRET عند التشगيل الفعلي.
+// "Collecting page data". NextAuth نفسه يفرض NEXTAUTH_SECRET عند التشغيل الفعلي.
 if (process.env.NODE_ENV === "production" && !process.env.NEXTAUTH_SECRET) {
-  console.warn("⚠️ NEXTAUTH_SECRET गير مضبوط! أضفه في Vercel → Settings → Environment Variables.");
+  console.warn("⚠️ NEXTAUTH_SECRET غير مضبوط! أضفه في Vercel → Settings → Environment Variables.");
 }
 
 type AuthUserRow = {
@@ -20,7 +20,7 @@ type AuthUserRow = {
 
 export const authOptions: NextAuthOptions = {
   // ملاحظة: لا نستخدم PrismaAdapter لأن المصادقة credentials + JWT فقط،
-  // والمحوّل يتطلب جداول Account/Session गير الموجودة في المخطط.
+  // والمحوّل يتطلب جداول Account/Session غير الموجودة في المخطط.
   session: {
     strategy: "jwt",
     maxAge: 60 * 60 * 24 * 7, // أسبوع واحد
@@ -48,12 +48,12 @@ export const authOptions: NextAuthOptions = {
         );
         if (!user) {
           // رسالة موحدة لمنع معرفة هل البريد مسجل أم لا (User Enumeration)
-          throw new Error("بيانات الدخول गير صحيحة");
+          throw new Error("بيانات الدخول غير صحيحة");
         }
 
         const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
         if (!isPasswordValid) {
-          throw new Error("بيانات الدخول गير صحيحة");
+          throw new Error("بيانات الدخول غير صحيحة");
         }
 
         return {

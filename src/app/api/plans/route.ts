@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
 
-export const dynamic = "force-dynamic";
+// بيانات الباقات نادراً ما تتبدّل، لهذا نستخدم تخزيناً مؤقتاً (60 ثانية) لتقليل الحمل على قاعدة البيانات
+export const revalidate = 60;
 
 type PlanRow = {
   priceMonthly: string;

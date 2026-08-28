@@ -31,11 +31,11 @@ export async function POST(request: Request) {
 
     // 🛡️ قائمة بيضاء للأدوار — منع تصعيد الصلاحيات (لا يمكن التسجيل كـ ADMIN أبداً)
     if (!(ALLOWED_ROLES as readonly string[]).includes(role)) {
-      return NextResponse.json({ message: "نوع الحساب गير صالح" }, { status: 400 });
+      return NextResponse.json({ message: "نوع الحساب غير صالح" }, { status: 400 });
     }
 
     if (!EMAIL_RE.test(email)) {
-      return NextResponse.json({ message: "صيगة البريد الإلكتروني गير صحيحة" }, { status: 400 });
+      return NextResponse.json({ message: "صيغة البريد الإلكتروني غير صحيحة" }, { status: 400 });
     }
 
     if (name.length < 2 || name.length > 60) {

@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   try {
     const sessionUser = await getSessionUser();
     if (!sessionUser) {
-      return NextResponse.json({ message: "गير مصرح لك" }, { status: 401 });
+      return NextResponse.json({ message: "غير مصرح لك" }, { status: 401 });
     }
 
     const body = await request.json().catch(() => null);
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const comment = typeof body?.comment === "string" ? body.comment.trim().slice(0, 500) : null;
 
     if (!placeId || typeof placeId !== "string") {
-      return NextResponse.json({ message: "معرف المعلم गير صالح" }, { status: 400 });
+      return NextResponse.json({ message: "معرف المعلم غير صالح" }, { status: 400 });
     }
 
     // 🛡️ تحقق صارم من التقييم: عدد صحيح بين 1 و 5

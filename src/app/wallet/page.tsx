@@ -40,7 +40,7 @@ export default async function WalletPage() {
 
   const userId = session!.user!.id;
 
-  // 2. جلب الرصيد + أحدथ 20 عملية من دفتر الأستاذ بالتوازي
+  // 2. جلب الرصيد + أحدث 20 عملية من دفتر الأستاذ بالتوازي
   const [user, transactions] = await Promise.all([
     queryOne<{ balance: string; name: string }>(
       `SELECT "balance", "name" FROM "User" WHERE "id" = $1`,

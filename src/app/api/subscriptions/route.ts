@@ -59,18 +59,18 @@ export async function POST(req: Request) {
     const billingCycle = body?.billingCycle === "YEARLY" ? "YEARLY" : "MONTHLY";
 
     if (!planKey || typeof planKey !== "string") {
-      return NextResponse.json({ message: "الباقة गير صالحة" }, { status: 400 });
+      return NextResponse.json({ message: "الباقة غير صالحة" }, { status: 400 });
     }
 
     const plan = await queryOne<PlanRow>(`SELECT * FROM "Plan" WHERE "key" = $1`, [planKey]);
     if (!plan || !plan.isActive) {
-      return NextResponse.json({ message: "هذه الباقة गير متاحة" }, { status: 404 });
+      return NextResponse.json({ message: "هذه الباقة غير متاحة" }, { status: 404 });
     }
 
     // الباقة يجب أن تناسب دور المستخدم
     if (plan.targetRole !== sessionUser.role && sessionUser.role !== "ADMIN") {
       return NextResponse.json(
-        { message: "هذه الباقة गير مخصّصة لنوع حسابك" },
+        { message: "هذه الباقة غير مخصّصة لنوع حسابك" },
         { status: 403 },
       );
     }
@@ -94,7 +94,7 @@ export async function POST(req: Request) {
           [price, sessionUser.id],
         );
         if (debited.rowCount === 0) {
-          throw new Error(`رصيدك गير كافٍ. تحتاج ${price} د.ج. اشحن محفظتك أولاً.`);
+          throw new Error(`رصيدك غير كافٍ. تحتاج ${price} د.ج. اشحن محفظتك أولاً.`);
         }
         await recordLedger(tx, {
           userId: sessionUser.id,
@@ -106,7 +106,7 @@ export async function POST(req: Request) {
         });
       }
 
-      // 2. إلगاء أي اشتراك فعّال سابق
+      // 2. إلغاء أي اشتراك فعّال سابق
       await tx.query(
         `UPDATE "Subscription" SET "status" = 'CANCELED' WHERE "userId" = $1 AND "status" IN ('ACTIVE', 'TRIAL')`,
         [sessionUser.id],
@@ -142,7 +142,7 @@ export async function POST(req: Request) {
   } catch (error: unknown) {
     const err = error as { message?: string };
     const msg = err?.message || "حدث خطأ في الخادم";
-    const isClientError = msg.includes("गير كاف");
+    const isClientError = msg.includes("غير كاف");
     return NextResponse.json({ message: msg }, { status: isClientError ? 400 : 500 });
   }
 }

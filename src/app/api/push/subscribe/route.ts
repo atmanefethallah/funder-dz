@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => null);
     const sub = body?.subscription;
     if (!sub?.endpoint || !sub?.keys?.p256dh || !sub?.keys?.auth) {
-      return NextResponse.json({ message: "بيانات اشتراك गير صالحة" }, { status: 400 });
+      return NextResponse.json({ message: "بيانات اشتراك غير صالحة" }, { status: 400 });
     }
 
     // upsert على endpoint الفريد (جهاز واحد = اشتراك واحد)
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
   }
 }
 
-// 🔕 إلगاء الاشتراك
+// 🔕 إلغاء الاشتراك
 export async function DELETE(req: Request) {
   try {
     const sessionUser = await getSessionUser();

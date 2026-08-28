@@ -7,7 +7,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   try {
     const sessionUser = await getSessionUser();
     if (!sessionUser) {
-      return NextResponse.json({ message: "गير مصرح" }, { status: 401 });
+      return NextResponse.json({ message: "غير مصرح" }, { status: 401 });
     }
 
     const existingPlace = await queryOne<{ userId: string }>(
@@ -15,7 +15,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       [params.id],
     );
     if (!existingPlace) {
-      return NextResponse.json({ message: "المعلم गير موجود" }, { status: 404 });
+      return NextResponse.json({ message: "المعلم غير موجود" }, { status: 404 });
     }
 
     // 🛡️ فحص الملكية: المالك أو المدير فقط
@@ -44,13 +44,13 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
     const price = Number(priceStr);
     if (!Number.isFinite(price) || price < 0) {
-      return NextResponse.json({ message: "السعر गير صالح" }, { status: 400 });
+      return NextResponse.json({ message: "السعر غير صالح" }, { status: 400 });
     }
 
     const lat = latStr ? parseFloat(latStr) : null;
     const lng = lngStr ? parseFloat(lngStr) : null;
     if ((latStr && !Number.isFinite(lat)) || (lngStr && !Number.isFinite(lng))) {
-      return NextResponse.json({ message: "إحداثيات गير صالحة" }, { status: 400 });
+      return NextResponse.json({ message: "إحداثيات غير صالحة" }, { status: 400 });
     }
 
     const updatedPlace = await queryOne(
@@ -82,7 +82,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
       [params.id],
     );
     if (!existingPlace) {
-      return NextResponse.json({ message: "المعلم गير موجود" }, { status: 404 });
+      return NextResponse.json({ message: "المعلم غير موجود" }, { status: 404 });
     }
 
     if (existingPlace.userId !== sessionUser.id && sessionUser.role !== "ADMIN") {

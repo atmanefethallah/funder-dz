@@ -116,7 +116,7 @@ export async function PUT(req: Request) {
 
     if (!name) {
       return NextResponse.json(
-        { message: "اسم الحساب لا يمكن أن يكون فارगاً" },
+        { message: "اسم الحساب لا يمكن أن يكون فارغاً" },
         { status: 400 }
       );
     }
@@ -125,7 +125,7 @@ export async function PUT(req: Request) {
     }
     if (phone && !/^[+0-9\s-]{6,20}$/.test(phone)) {
       return NextResponse.json(
-        { message: "رقم الهاتف गير صالح" },
+        { message: "رقم الهاتف غير صالح" },
         { status: 400 }
       );
     }

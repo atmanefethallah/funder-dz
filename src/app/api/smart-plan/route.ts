@@ -15,7 +15,7 @@ type PlaceRow = {
   [key: string]: unknown;
 };
 
-// 🧠 1. محرك الحسابات الجगرافية (مدمج هنا لتفادي أي أخطاء في الاستيراد)
+// 🧠 1. محرك الحسابات الجغرافية (مدمج هنا لتفادي أي أخطاء في الاستيراد)
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
   if (!lat1 || !lon1 || !lat2 || !lon2) return 9999; // إذا كانت الإحداثيات ناقصة نعطي مسافة بعيدة
   const R = 6371; // نصف قطر الأرض بالكيلومتر
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     const allPlaces = allPlacesRaw.map((p) => ({ ...p, price: Number(p.price) }));
 
     if (allPlaces.length === 0) {
-      return NextResponse.json({ message: "قاعدة البيانات فارगة! يرجى إضافة معالم سياحية أولاً." }, { status: 404 });
+      return NextResponse.json({ message: "قاعدة البيانات فارغة! يرجى إضافة معالم سياحية أولاً." }, { status: 404 });
     }
 
     // تصفية المعالم حسب الميزانية المختارة
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
           .filter((e) => e.id !== referencePlace.id) // تجنب اختيار نفس المكان
           .map((e) => ({
             ...e,
-            // 👈 إضافة ?? 0 لتأمين التطبيق من القيم الفارगة (null)
+            // 👈 إضافة ?? 0 لتأمين التطبيق من القيم الفارغة (null)
             distance: calculateDistance(
               referencePlace.latitude ?? 0,
               referencePlace.longitude ?? 0,
@@ -115,7 +115,7 @@ export async function POST(request: Request) {
     const itinerary = {
       breakfast: findClosestEatery(morningActivity),
       morningActivity: morningActivity,
-      lunch: findClosestEatery(morningActivity), // الगداء قريب من نشاط الصباح
+      lunch: findClosestEatery(morningActivity), // الغداء قريب من نشاط الصباح
       afternoonActivity: afternoonActivity,
       coffeeTime: findClosestEatery(afternoonActivity), // القهوة قريبة من نشاط المساء
       dinner: findClosestEatery(afternoonActivity),

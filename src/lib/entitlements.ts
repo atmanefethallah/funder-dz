@@ -2,9 +2,9 @@
 import { query, queryOne } from "@/lib/db";
 
 export type PlanFeatures = {
-  maxPlaces?: number; // -1 = गير محدود
+  maxPlaces?: number; // -1 = غير محدود
   commissionRate?: number;
-  smartPlansPerMonth?: number; // -1 = गير محدود
+  smartPlansPerMonth?: number; // -1 = غير محدود
   depositRate?: number;
   vrTours?: number;
   featured?: boolean;
@@ -40,7 +40,7 @@ const FREE_DEFAULTS: Record<string, PlanFeatures> = {
   TOURIST: { smartPlansPerMonth: 3, depositRate: 0.1, exclusiveVr: false, priorityBooking: false, partnerDiscounts: false },
 };
 
-/** يجلب الاشتراك الفعّال (ACTIVE/TRIAL गير المنتهي) مع باقته */
+/** يجلب الاشتراك الفعّال (ACTIVE/TRIAL غير المنتهي) مع باقته */
 export async function getActiveSubscription(userId: string): Promise<ActiveSubscription | null> {
   const row = await queryOne<{
     id: string;
@@ -164,7 +164,7 @@ export async function canGenerateSmartPlan(userId: string): Promise<{ allowed: b
       allowed: false,
       used,
       limit,
-      reason: `استهلكت خططك المجانية لهذا الشهر (${limit}). باقة ${planName === "الباقة المجانية" ? "Funder Plus" : planName} تمنحك خططاً गير محدودة.`,
+      reason: `استهلكت خططك المجانية لهذا الشهر (${limit}). باقة ${planName === "الباقة المجانية" ? "Funder Plus" : planName} تمنحك خططاً غير محدودة.`,
     };
   }
   return { allowed: true, used, limit };

@@ -3,7 +3,7 @@ import { query } from "@/lib/db";
 import { getSessionUser } from "@/lib/session";
 import { getActiveSubscription } from "@/lib/entitlements";
 
-// ❌ إلगاء الاشتراك — يبقى فعّالاً حتى نهاية الدورة المدفوعة
+// ❌ إلغاء الاشتراك — يبقى فعّالاً حتى نهاية الدورة المدفوعة
 export async function POST() {
   try {
     const sessionUser = await getSessionUser();
@@ -13,11 +13,11 @@ export async function POST() {
 
     const sub = await getActiveSubscription(sessionUser.id);
     if (!sub) {
-      return NextResponse.json({ message: "لا يوجد اشتراك فعّال لإلगاءه" }, { status: 404 });
+      return NextResponse.json({ message: "لا يوجد اشتراك فعّال لإلغاءه" }, { status: 404 });
     }
 
     if (sub.cancelAtPeriodEnd) {
-      return NextResponse.json({ message: "الاشتراك مُلगى بالفعل وينتهي قريباً" }, { status: 400 });
+      return NextResponse.json({ message: "الاشتراك مُلغى بالفعل وينتهي قريباً" }, { status: 400 });
     }
 
     await query(`UPDATE "Subscription" SET "cancelAtPeriodEnd" = true WHERE "id" = $1`, [sub.id]);
@@ -26,14 +26,14 @@ export async function POST() {
       `INSERT INTO "Notification" ("userId", "title", "message", "link") VALUES ($1, $2, $3, $4)`,
       [
         sessionUser.id,
-        "تم إلगاء التجديد التلقائي",
+        "تم إلغاء التجديد التلقائي",
         `ستحتفظ بمزايا "${sub.plan.name}" حتى نهاية دورتك الحالية، ولن يتم تجديدها تلقائياً.`,
         "/pricing",
       ],
     );
 
     return NextResponse.json({
-      message: "تم إلगاء التجديد. ستحتفظ بمزاياك حتى نهاية الدورة الحالية.",
+      message: "تم إلغاء التجديد. ستحتفظ بمزاياك حتى نهاية الدورة الحالية.",
     });
   } catch (error) {
     console.error("Cancel Subscription Error:", error);

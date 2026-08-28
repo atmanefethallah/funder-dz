@@ -58,7 +58,7 @@ export default async function TicketPage({ params }: { params: { id: string } })
 
           <h2 className="text-2xl font-black text-gray-900 mb-1 leading-tight">{booking.place_name}</h2>
           <p className="text-gray-500 text-xs font-bold mb-6 flex items-center gap-1">
-            <MapPin size={12} className="text-blue-500" /> ولاية مستगانم - سياحة ذكية
+            <MapPin size={12} className="text-blue-500" /> ولاية مستغانم - سياحة ذكية
           </p>
 
           <div className="grid grid-cols-2 gap-4 bg-gray-50 rounded-2xl p-4 border border-gray-100">

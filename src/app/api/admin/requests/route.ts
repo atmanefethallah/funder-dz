@@ -21,7 +21,7 @@ type RechargeRequestRow = {
 export async function GET() {
   try {
     const admin = await requireRole("ADMIN");
-    if (!admin) return NextResponse.json({ message: "गير مصرح" }, { status: 403 });
+    if (!admin) return NextResponse.json({ message: "غير مصرح" }, { status: 403 });
 
     const rows = await query<RechargeRequestRow>(
       `SELECT r.*, u."name" AS user_name, u."email" AS user_email
@@ -53,16 +53,16 @@ export async function GET() {
 // ⚙️ الموافقة أو الرفض على طلب الشحن (للمدير فقط) مع توثيق دفتر الأستاذ
 export async function PUT(request: Request) {
   try {
-    // 🛡️ كان هذا المسار بلا أي فحص صلاحية سابقاً — أगلق الآن
+    // 🛡️ كان هذا المسار بلا أي فحص صلاحية سابقاً — أغلق الآن
     const admin = await requireRole("ADMIN");
-    if (!admin) return NextResponse.json({ message: "गير مصرح" }, { status: 403 });
+    if (!admin) return NextResponse.json({ message: "غير مصرح" }, { status: 403 });
 
     const body = await request.json().catch(() => null);
     const requestId = body?.requestId;
     const action = body?.action;
 
     if (!requestId || !["APPROVE", "REJECT"].includes(action)) {
-      return NextResponse.json({ message: "طلب गير صالح" }, { status: 400 });
+      return NextResponse.json({ message: "طلب غير صالح" }, { status: 400 });
     }
 
     const rechargeRequest = await queryOne<{
@@ -75,7 +75,7 @@ export async function PUT(request: Request) {
 
     if (!rechargeRequest || rechargeRequest.status !== "PENDING") {
       return NextResponse.json(
-        { message: "هذا الطلب गير صالح أو تمت معالجته مسبقاً" },
+        { message: "هذا الطلب غير صالح أو تمت معالجته مسبقاً" },
         { status: 400 },
       );
     }

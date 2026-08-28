@@ -45,7 +45,7 @@ export async function chargeWallet(voucherCode: string) {
       const voucher = voucherRes.rows[0];
 
       if (!voucher || !voucher.isActive) {
-        throw new Error("رمز الشحن गير صالح.");
+        throw new Error("رمز الشحن غير صالح.");
       }
       if (voucher.expiresAt && new Date(voucher.expiresAt) < new Date()) {
         throw new Error("هذه القسيمة منتهية الصلاحية.");
@@ -93,7 +93,7 @@ export async function chargeWallet(voucherCode: string) {
     revalidatePath("/wallet");
     revalidatePath("/profile");
 
-    return { success: true, message: `تم شحن رصيدك بنجاح بمبلग ${chargedAmount} د.ج!` };
+    return { success: true, message: `تم شحن رصيدك بنجاح بمبلغ ${chargedAmount} د.ج!` };
   } catch (error: unknown) {
     const err = error as { code?: string; message?: string };
     // استخدم هذه القسيمة من قبل (القيد الفريد)

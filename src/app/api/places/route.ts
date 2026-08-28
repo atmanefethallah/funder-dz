@@ -109,7 +109,7 @@ export async function POST(request: Request) {
 
     const price = Number(priceStr) || 0;
     if (price < 0 || price > 100_000_000) {
-      return NextResponse.json({ message: "السعر गير صالح" }, { status: 400 });
+      return NextResponse.json({ message: "السعر غير صالح" }, { status: 400 });
     }
 
     let imageUrl = "";
@@ -117,7 +117,7 @@ export async function POST(request: Request) {
     if (file && file instanceof File && file.size > 0) {
       if (file.size > 5 * 1024 * 1024) {
         return NextResponse.json(
-          { message: "حجم الصورة كبير جداً! الحد الأقصى 5 ميगابايت." },
+          { message: "حجم الصورة كبير جداً! الحد الأقصى 5 ميغابايت." },
           { status: 400 }
         );
       }

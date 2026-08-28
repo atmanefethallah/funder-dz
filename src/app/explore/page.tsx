@@ -14,7 +14,7 @@ const InteractiveMap = dynamic(() => import("@/components/map/PlacesMap"), {
   ssr: false,
   loading: () => (
     <div className="flex h-full w-full items-center justify-center bg-gray-100 animate-pulse">
-      <p className="text-blue-600 font-bold flex items-center gap-2">🗺️ جاري رسم الخريطة الجगرافية الذكية...</p>
+      <p className="text-blue-600 font-bold flex items-center gap-2">🗺️ جاري رسم الخريطة الجغرافية الذكية...</p>
     </div>
   ),
 });
@@ -82,7 +82,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: { q?
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-right">
             <h1 className="text-xl font-black text-gray-900 flex items-center gap-2">
-              اكتشف مستगانم الذكية <Sparkles size={18} className="text-amber-500 fill-amber-500" />
+              اكتشف مستغانم الذكية <Sparkles size={18} className="text-amber-500 fill-amber-500" />
             </h1>
           </div>
           <div className="w-full md:w-auto">
@@ -115,7 +115,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: { q?
           {places.length === 0 ? (
             <div className="py-20 text-center text-gray-400 flex flex-col items-center justify-center">
               <span className="text-4xl mb-3">🏜️</span>
-              <p className="font-bold">لم نجد أي معالم جगرافية مضافة هنا بعد.</p>
+              <p className="font-bold">لم نجد أي معالم جغرافية مضافة هنا بعد.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
