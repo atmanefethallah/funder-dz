@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ShieldCheck, Loader2, CheckCircle, XCircle, ExternalLink, Users, Map as MapIcon, Ticket, Activity, Megaphone, Send } from "lucide-react";
+import Link from "next/link";
+import { ShieldCheck, Loader2, CheckCircle, XCircle, ExternalLink, Users, Map as MapIcon, Ticket, Activity, Megaphone, Send, UserCheck } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 
 export default function AdminDashboard() {
@@ -121,6 +122,16 @@ export default function AdminDashboard() {
         <span className="bg-red-100 text-red-600 px-4 py-1.5 rounded-full text-sm font-black border border-red-200 shadow-sm flex items-center gap-2">
           <Activity size={16} className="animate-pulse" /> STATUS: ONLINE
         </span>
+      </div>
+
+      {/* 🔗 روابط سريعة للأقسام الفرعية للإدارة */}
+      <div className="flex flex-wrap gap-3 mb-10">
+        <Link href="/admin/vouchers" className="flex items-center gap-2 bg-white border shadow-sm hover:shadow-md hover:-translate-y-0.5 transition rounded-xl px-4 py-2.5 font-bold text-sm text-gray-700">
+          <Ticket size={18} className="text-blue-600" /> إدارة قسائم فندر
+        </Link>
+        <Link href="/admin/partner-requests" className="flex items-center gap-2 bg-white border shadow-sm hover:shadow-md hover:-translate-y-0.5 transition rounded-xl px-4 py-2.5 font-bold text-sm text-gray-700">
+          <UserCheck size={18} className="text-emerald-600" /> طلبات اعتماد الشركاء
+        </Link>
       </div>
 
       {/* 📊 القسم الأول: إحصائيات المنصة */}

@@ -185,7 +185,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: { q?
                           
                           {isPlaceFree ? (
                             <ProtectedLink
-                              href={`{{https://www.google.com/maps/dir/?api=1&destination=${place.latitude}}},${place.longitude}`}
+                              href={`https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`}
                               isLoggedIn={isLoggedIn}
                               message="يرجى تسجيل الدخول أولاً لتفعيل الخرائط الحية وبدء المسار 🧭"
                               

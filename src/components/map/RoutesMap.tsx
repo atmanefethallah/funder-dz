@@ -5,17 +5,23 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useEffect } from 'react';
+import { getCategoryMeta } from '@/lib/placeCategoryIcons';
 
-// إصلاح مشكلة الأيقونات الافتراضية في Leaflet مع Next.js
-const customIcon = new L.Icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
+// 🎯 أيقونة مخصّصة لكل معلم حسب نوعه (رمز + لون مميّز)
+function createCategoryIcon(category: string) {
+  const meta = getCategoryMeta(category);
+  return L.divIcon({
+    className: 'custom-category-pin',
+    html: `
+      <div style="background:${meta.color}" class="flex items-center justify-center w-9 h-9 rounded-full border-2 border-white shadow-lg text-base">
+        ${meta.emoji}
+      </div>
+    `,
+    iconSize: [36, 36],
+    iconAnchor: [18, 36],
+    popupAnchor: [0, -32],
+  });
+}
 
 // تعريف واجهة البيانات التي سيستقبلها المكون
 interface Place {
@@ -45,28 +51,31 @@ export default function RoutesMap({ places }: { places: Place[] }) {
         />
 
         {/* رسم المعالم السياحية على الخريطة */}
-        {places.map((place) => (
-          <Marker 
-            key={place.id} 
-            position={[place.latitude, place.longitude]} 
-            icon={customIcon}
-          >
-            <Popup className="font-sans">
-              <div className="text-right" dir="rtl">
-                <span className="mb-1 inline-block rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-800">
-                  {place.category === 'CULTURAL' ? 'مسلك ثقافي' : 'مسلك ترفيهي'}
-                </span>
-                <h3 className="text-sm font-bold text-gray-900">{place.name}</h3>
-                <a 
-                  href={`/places/${place.id}`} 
-                  className="mt-2 block text-xs text-blue-600 hover:underline"
-                >
-                  التفاصيل والحجز &larr;
-                </a>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        {places.map((place) => {
+          const meta = getCategoryMeta(place.category);
+          return (
+            <Marker
+              key={place.id}
+              position={[place.latitude, place.longitude]}
+              icon={createCategoryIcon(place.category)}
+            >
+              <Popup className="font-sans">
+                <div className="text-right" dir="rtl">
+                  <span className={`mb-1 inline-block rounded-full ${meta.bgClass} px-2 py-0.5 text-[10px] font-bold ${meta.textClass}`}>
+                    {meta.emoji} {meta.label}
+                  </span>
+                  <h3 className="text-sm font-bold text-gray-900">{place.name}</h3>
+                  <a
+                    href={`/places/${place.id}`}
+                    className="mt-2 block text-xs text-blue-600 hover:underline"
+                  >
+                    التفاصيل والحجز &larr;
+                  </a>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
       </MapContainer>
     </div>
   );

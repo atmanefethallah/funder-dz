@@ -14,6 +14,8 @@ type PlaceType = {
   price: number;
   imageUrl?: string | null;
   virtualTourUrl?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   user: { name: string };
 };
 
@@ -42,6 +44,12 @@ export default function PlaceDetailsClient({
   const [reviewSuccess, setReviewSuccess] = useState(false);
 
   const totalPrice = place.price * ticketCount;
+
+  // رابط الملاحة المباشر لموقع المعلم الدقيق حسب الإدّحيات التي وضعها الشريك
+  const hasCoords = place.latitude != null && place.longitude != null;
+  const mapsHref = hasCoords
+    ? `https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`
+    : "/map";
 
   // 🚀 دالة الحجز للمعالم المدفوعة
   const handleBooking = async () => {
@@ -239,9 +247,19 @@ export default function PlaceDetailsClient({
                 <p className="text-sm text-gray-500 mb-6 leading-relaxed">
                   هذا المكان السياحي مفتوح للعامة ولا يتطلب حجز تذاكر مسبقة. يمكنك زيارته والاستمتاع به في أي وقت!
                 </p>
-                <Link href="/map" className="w-full bg-green-600 text-white p-4 rounded-xl font-black text-base hover:bg-green-700 transition shadow-md shadow-green-600/20 flex items-center justify-center gap-2">
+                <Link
+                  href={mapsHref}
+                  target={hasCoords ? "_blank" : "_self"}
+                  rel={hasCoords ? "noopener noreferrer" : undefined}
+                  className="w-full bg-green-600 text-white p-4 rounded-xl font-black text-base hover:bg-green-700 transition shadow-md shadow-green-600/20 flex items-center justify-center gap-2"
+                >
                   <MapPin size={20} /> عرض المسار والانطلاق
                 </Link>
+                {!hasCoords && (
+                  <p className="text-[10px] text-amber-600 text-center mt-2">
+                    لم يحدّد الشريك موقعاً دقيقاً لهذا المعلم بعد.
+                  </p>
+                )}
               </div>
             ) : (
               // 🎫 واجهة الحجز للمعلم المدفوع

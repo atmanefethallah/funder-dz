@@ -14,6 +14,8 @@ type WishlistRow = {
   place_price: string;
   place_imageUrl: string | null;
   place_description: string | null;
+  place_latitude: number | null;
+  place_longitude: number | null;
   place_reviews: Array<{ rating: number }>;
 };
 
@@ -32,6 +34,7 @@ export default async function WishlistPage() {
     `SELECT w."id",
             p."id" AS place_id, p."name" AS place_name, p."category" AS place_category,
             p."price" AS place_price, p."imageUrl" AS place_imageUrl, p."description" AS place_description,
+            p."latitude" AS place_latitude, p."longitude" AS place_longitude,
             COALESCE(json_agg(json_build_object('rating', r."rating")) FILTER (WHERE r."id" IS NOT NULL), '[]') AS place_reviews
      FROM "Wishlist" w
      JOIN "Place" p ON p."id" = w."placeId"
@@ -51,6 +54,8 @@ export default async function WishlistPage() {
       price: Number(item.place_price),
       imageUrl: item.place_imageUrl,
       description: item.place_description,
+      latitude: item.place_latitude,
+      longitude: item.place_longitude,
       reviews: item.place_reviews,
     },
   }));
@@ -125,8 +130,14 @@ export default async function WishlistPage() {
                       {place.price > 0 ? (
                         <BookingButton placeId={place.id} price={place.price} />
                       ) : (
-                        <Link 
-                          href="/map" 
+                        <Link
+                          href={
+                            place.latitude != null && place.longitude != null
+                              ? `https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`
+                              : "/map"
+                          }
+                          target={place.latitude != null && place.longitude != null ? "_blank" : "_self"}
+                          rel="noopener noreferrer"
                           className="flex items-center gap-1 rounded-xl bg-green-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-green-700 shadow-sm"
                         >
                           <MapPin size={16} /> عرض المسار

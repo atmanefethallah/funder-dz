@@ -7,6 +7,7 @@ import "leaflet-defaulticon-compatibility";
 import Link from "next/link";
 import { MapPin, Navigation } from "lucide-react";
 import L from "leaflet"; // استدعاء مكتبة ليفلت الأساسية لبرمجة الدبابيس المخصصة
+import { getCategoryMeta } from "@/lib/placeCategoryIcons";
 
 type PlaceMarker = {
   id: string;
@@ -48,16 +49,18 @@ export default function InteractiveMap({ places, isLoggedIn }: { places: PlaceMa
           
           const target = (isLoggedIn && isFree) ? "_blank" : "_self";
 
-          // 🌟 صناعة فقاعة السعر الذكية (Airbnb Style) لمنع التزحزح وإعطاء مظهر فخم
+          // 🌟 صناعة فقاعة السعر الذكية (Airbnb Style) مع رمز التصنيف لمنع التزحزح وإعطاء مظهر فخم
+          const meta = getCategoryMeta(place.category);
           const priceTagIcon = L.divIcon({
             className: "custom-price-tag",
             html: `
-              <div class="flex items-center justify-center bg-white border-2 ${isFree ? 'border-green-500 text-green-600' : 'border-blue-600 text-blue-600'} font-black text-[11px] px-2 py-1 rounded-full shadow-md transition-all hover:bg-gray-900 hover:text-white duration-200 whitespace-nowrap">
-                ${isFree ? 'مجاني' : place.price + ' دج'}
+              <div class="flex items-center gap-1 justify-center bg-white border-2 ${isFree ? 'border-green-500 text-green-600' : 'border-blue-600 text-blue-600'} font-black text-[11px] px-2 py-1 rounded-full shadow-md transition-all hover:bg-gray-900 hover:text-white duration-200 whitespace-nowrap">
+                <span>${meta.emoji}</span>
+                <span>${isFree ? 'مجاني' : place.price + ' دج'}</span>
               </div>
             `,
-            iconSize: [55, 25],
-            iconAnchor: [27, 12] // يضمن تثبيت السهم في النقطة الجغرافية بدقة متناهية
+            iconSize: [65, 25],
+            iconAnchor: [32, 12] // يضمن تثبيت السهم في النقطة الجغرافية بدقة متناهية
           });
 
           return (
@@ -81,7 +84,9 @@ export default function InteractiveMap({ places, isLoggedIn }: { places: PlaceMa
                   )}
                   
                   <h3 className="font-bold text-gray-900 text-xs mb-1 line-clamp-1">{place.name}</h3>
-                  <p className="text-[11px] text-gray-400 mb-2">{place.category}</p>
+                  <span className={`inline-block mb-2 rounded-full ${meta.bgClass} px-2 py-0.5 text-[10px] font-bold ${meta.textClass}`}>
+                    {meta.emoji} {meta.label}
+                  </span>
                   
                   <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
                     <span className={`font-black text-xs ${isFree ? "text-green-600" : "text-blue-600"}`}>

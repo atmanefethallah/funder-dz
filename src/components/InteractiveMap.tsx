@@ -6,6 +6,25 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import "leaflet-defaulticon-compatibility";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
+import L from "leaflet";
+import { getCategoryMeta } from "@/lib/placeCategoryIcons";
+
+// 🎯 أيقونة دبّوس تدمج رمز التصنيف مع حالة المعلم (مجاني/مدفوع) لتجربة تفاعلية موحّدة
+function createPlaceIcon(category: string, isFree: boolean, price: number) {
+  const meta = getCategoryMeta(category);
+  return L.divIcon({
+    className: "custom-place-pin",
+    html: `
+      <div class="flex items-center gap-1 bg-white border-2 ${isFree ? 'border-green-500 text-green-600' : 'border-blue-600 text-blue-600'} font-black text-[11px] px-2 py-1 rounded-full shadow-md whitespace-nowrap">
+        <span>${meta.emoji}</span>
+        <span>${isFree ? 'مجاني' : price + ' دج'}</span>
+      </div>
+    `,
+    iconSize: [60, 26],
+    iconAnchor: [30, 13],
+    popupAnchor: [0, -14],
+  });
+}
 
 // تعريف نوع البيانات الخاصة بالمعلم السياحي
 type PlaceMarker = {
@@ -53,8 +72,9 @@ export default function InteractiveMap({ places, isLoggedIn }: { places: PlaceMa
           // 🧠 إذا كان سيرسله لخرائط جوجل نفتحها في نافذة جديدة أو التطبيق
           const target = (isLoggedIn && isFree) ? "_blank" : "_self";
 
+          const meta = getCategoryMeta(place.category);
           return (
-            <Marker key={place.id} position={[place.latitude, place.longitude]}>
+            <Marker key={place.id} position={[place.latitude, place.longitude]} icon={createPlaceIcon(place.category, isFree, place.price)}>
               <Popup className="rounded-xl overflow-hidden">
                 <div className="w-52 text-right p-1" dir="rtl">
                   {place.imageUrl ? (
@@ -80,7 +100,9 @@ export default function InteractiveMap({ places, isLoggedIn }: { places: PlaceMa
                   )}
                   
                   <h3 className="font-bold text-gray-900 text-sm mb-1 line-clamp-1">{place.name}</h3>
-                  <p className="text-xs text-gray-500 mb-3">{place.category}</p>
+                  <span className={`inline-block mb-3 rounded-full ${meta.bgClass} px-2 py-0.5 text-[10px] font-bold ${meta.textClass}`}>
+                    {meta.emoji} {meta.label}
+                  </span>
                   
                   <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
                     {/* عرض السعر أو كلمة مجاني */}
