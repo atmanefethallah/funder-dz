@@ -1,33 +1,16 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import "leaflet-defaulticon-compatibility";
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { MapPin, LocateFixed } from "lucide-react";
 import L from "leaflet";
 import { getCategoryMeta } from "@/lib/placeCategoryIcons";
 
-// 🎯 أيقونة دبّوس تدمج رمز التصنيف مع حالة المعلم (مجاني/مدفوع) لتجربة تفاعلية موحّدة
-function createPlaceIcon(category: string, isFree: boolean, price: number) {
-  const meta = getCategoryMeta(category);
-  return L.divIcon({
-    className: "custom-place-pin",
-    html: `
-      <div class="flex items-center gap-1 bg-white border-2 ${isFree ? 'border-green-500 text-green-600' : 'border-blue-600 text-blue-600'} font-black text-[11px] px-2 py-1 rounded-full shadow-md whitespace-nowrap">
-        <span>${meta.emoji}</span>
-        <span>${isFree ? 'مجاني' : price + ' دج'}</span>
-      </div>
-    `,
-    iconSize: [60, 26],
-    iconAnchor: [30, 13],
-    popupAnchor: [0, -14],
-  });
-}
-
-// تعريف نوع البيانات الخاصة بالمعلم السياحي
-type PlaceMarker = {
+export type PlaceMarker = {
   id: string;
   name: string;
   category: string;
@@ -35,94 +18,64 @@ type PlaceMarker = {
   latitude: number;
   longitude: number;
   imageUrl?: string | null;
+  isEvent?: boolean | null;
+  eventEndsAt?: string | null;
 };
 
-export default function InteractiveMap({ places, isLoggedIn }: { places: PlaceMarker[], isLoggedIn: boolean }) {
-  // إحداثيات ولاية مستغانم الافتراضية للتركيز عليها عند فتح الخريطة
-  const defaultCenter = { lat: 35.9311, lng: 0.0891 };
+function createPlaceIcon(place: PlaceMarker) {
+  const meta = getCategoryMeta(place.category);
+  const isFree = place.price === 0 || !place.price;
+  const eventClass = place.isEvent ? "border-pink-500 text-pink-600" : isFree ? "border-green-500 text-green-600" : "border-blue-600 text-blue-600";
+  return L.divIcon({
+    className: "custom-place-pin",
+    html: `<div class="flex items-center gap-1 bg-white border-2 ${eventClass} font-black text-[11px] px-2 py-1 rounded-full shadow-lg whitespace-nowrap"><span>${place.isEvent ? "🎉" : meta.emoji}</span><span>${isFree ? "مجاني" : place.price + " دج"}</span></div>`,
+    iconSize: [68, 28], iconAnchor: [34, 14], popupAnchor: [0, -15],
+  });
+}
 
+function FitBounds({ places }: { places: PlaceMarker[] }) {
+  const map = useMap();
+  useEffect(() => {
+    const points = places.filter((p) => Number.isFinite(p.latitude) && Number.isFinite(p.longitude));
+    if (points.length === 1) map.setView([points[0].latitude, points[0].longitude], 14);
+    if (points.length > 1) map.fitBounds(L.latLngBounds(points.map((p) => [p.latitude, p.longitude])), { padding: [45, 45], maxZoom: 15 });
+  }, [map, places]);
+  return null;
+}
+
+function LocateControl() {
+  const map = useMap();
+  const locate = () => map.locate({ setView: true, maxZoom: 16, enableHighAccuracy: true });
   return (
-    <div className="w-full h-[500px] rounded-3xl overflow-hidden shadow-lg border-4 border-white z-0 relative">
-      <MapContainer 
-        center={[defaultCenter.lat, defaultCenter.lng]} 
-        zoom={12} 
-        scrollWheelZoom={false} 
-        style={{ height: "100%", width: "100%" }}
-      >
-        {/* استخدام طبقة خريطة دقيقة وعالمية */}
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> Funder DZ'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+    <button type="button" onClick={locate} title="حدد موقعي" className="absolute bottom-5 left-3 z-[1000] flex h-11 w-11 items-center justify-center rounded-xl border border-gray-200 bg-white text-blue-600 shadow-lg hover:bg-blue-50">
+      <LocateFixed size={21} />
+    </button>
+  );
+}
 
-        {places.filter(p => p.latitude && p.longitude).map((place) => {
-          // 🧠 المنطق الذكي: هل المكان مجاني أم مدفوع؟
+export default function InteractiveMap({ places, isLoggedIn, fill = false }: { places: PlaceMarker[]; isLoggedIn: boolean; fill?: boolean }) {
+  const validPlaces = places.filter((p) => Number.isFinite(p.latitude) && Number.isFinite(p.longitude));
+  return (
+    <div className={`w-full overflow-hidden z-0 relative ${fill ? "h-full" : "h-[500px] rounded-3xl shadow-lg border-4 border-white"}`}>
+      <MapContainer center={[35.9311, 0.0891]} zoom={12} scrollWheelZoom style={{ height: "100%", width: "100%" }}>
+        <TileLayer attribution='&copy; OpenStreetMap — Funder DZ' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <FitBounds places={validPlaces} />
+        <LocateControl />
+        {validPlaces.map((place) => {
           const isFree = place.price === 0 || !place.price;
-
-          // 🧠 تحديد نص الزر
-          const actionText = isFree ? "بدء المسار 🧭" : "حجز الآن 🎫";
-          
-          // 🧠 تحديد الرابط (الوجهة) بناءً على حالة تسجيل الدخول والسعر
-          const actionHref = !isLoggedIn 
-            ? "/register" // إذا لم يسجل دخول -> صفحة التسجيل
-            : isFree 
-            ? `https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}` // إذا مسجل ومجاني -> خرائط جوجل
-            : `/places/${place.id}`; // إذا مسجل ومدفوع -> صفحة الحجز والدفع
-          
-          // 🧠 إذا كان سيرسله لخرائط جوجل نفتحها في نافذة جديدة أو التطبيق
-          const target = (isLoggedIn && isFree) ? "_blank" : "_self";
-
+          const actionHref = !isLoggedIn ? "/register" : isFree ? `https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}` : `/places/${place.id}`;
+          const target = isLoggedIn && isFree ? "_blank" : "_self";
           const meta = getCategoryMeta(place.category);
           return (
-            <Marker key={place.id} position={[place.latitude, place.longitude]} icon={createPlaceIcon(place.category, isFree, place.price)}>
-              <Popup className="rounded-xl overflow-hidden">
+            <Marker key={place.id} position={[place.latitude, place.longitude]} icon={createPlaceIcon(place)}>
+              <Popup>
                 <div className="w-52 text-right p-1" dir="rtl">
-                  {place.imageUrl ? (
-                    <div className="w-full h-28 mb-2 bg-gray-100 rounded-lg overflow-hidden relative shadow-sm">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={place.imageUrl} alt={place.name} className="w-full h-full object-cover" />
-                      {/* شارة مجاني فوق الصورة إذا كان مجانياً */}
-                      {isFree && (
-                        <div className="absolute top-2 right-2 bg-green-500 text-white text-[10px] font-black px-2 py-1 rounded-md shadow-md">
-                          دخول مجاني
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="w-full h-24 mb-2 bg-blue-50 text-blue-300 flex items-center justify-center rounded-lg relative">
-                      <MapPin size={32} />
-                      {isFree && (
-                        <div className="absolute top-2 right-2 bg-green-500 text-white text-[10px] font-black px-2 py-1 rounded-md shadow-md">
-                          دخول مجاني
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  
+                  {place.imageUrl ? <div className="w-full h-28 mb-2 rounded-lg overflow-hidden"><img src={place.imageUrl} alt={place.name} className="w-full h-full object-cover" /></div> : <div className="w-full h-24 mb-2 bg-blue-50 text-blue-300 flex items-center justify-center rounded-lg"><MapPin size={30} /></div>}
                   <h3 className="font-bold text-gray-900 text-sm mb-1 line-clamp-1">{place.name}</h3>
-                  <span className={`inline-block mb-3 rounded-full ${meta.bgClass} px-2 py-0.5 text-[10px] font-bold ${meta.textClass}`}>
-                    {meta.emoji} {meta.label}
-                  </span>
-                  
-                  <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
-                    {/* عرض السعر أو كلمة مجاني */}
-                    {isFree ? (
-                      <span className="font-black text-green-600 text-sm">مجاني</span>
-                    ) : (
-                      <span className="font-black text-blue-600 text-sm" dir="ltr">{place.price} د.ج</span>
-                    )}
-                    
-                    {/* 🌟 الزر التكيفي (يتغير لونه ووظيفته) */}
-                    <Link 
-                      href={actionHref} 
-                      target={target}
-                      rel={target === "_blank" ? "noopener noreferrer" : ""}
-                      className={`text-white text-xs px-3 py-2 rounded-lg transition shadow-md block text-center font-bold ${
-                        isFree ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-900 hover:bg-gray-800'
-                      }`}
-                    >
-                      {actionText}
-                    </Link>
+                  <span className={`inline-block mb-2 rounded-full ${place.isEvent ? "bg-pink-50 text-pink-700" : `${meta.bgClass} ${meta.textClass}`} px-2 py-0.5 text-[10px] font-bold`}>{place.isEvent ? "🎉 فعالية مؤقتة" : `${meta.emoji} ${meta.label}`}</span>
+                  <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
+                    <span className={`font-black text-xs ${isFree ? "text-green-600" : "text-blue-600"}`}>{isFree ? "مجاني" : `${place.price} د.ج`}</span>
+                    <Link href={actionHref} target={target} rel={target === "_blank" ? "noopener noreferrer" : undefined} className={`text-white text-[11px] px-3 py-2 rounded-lg font-bold ${isFree ? "bg-green-600" : "bg-gray-900"}`}>{isFree ? "بدء المسار 🧭" : "الحجز والتفاصيل 🎫"}</Link>
                   </div>
                 </div>
               </Popup>

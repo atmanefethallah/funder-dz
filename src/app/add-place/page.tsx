@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { MapPin, Loader2, Upload, ShieldAlert, CheckCircle2, Clock, UploadCloud } from "lucide-react";
+import { MapPin, Loader2, Upload, ShieldAlert, CheckCircle2, Clock, UploadCloud, CalendarDays, BedDouble, Link2, Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
+import { parseGoogleMapsLink } from "@/lib/mapsLink";
 
 // 🗺️ استدعاء خريطة تحديد الموقع ديناميكياً لتجنب مشاكل السيرفر
 const LocationPickerMap = dynamic(() => import("@/components/LocationPickerMap"), {
@@ -31,8 +32,14 @@ export default function AddPlacePage() {
   const [price, setPrice] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [virtualTourUrl, setVirtualTourUrl] = useState("");
+  const [mapsLink, setMapsLink] = useState("");
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
+  const [isEvent, setIsEvent] = useState(false);
+  const [eventEndsAt, setEventEndsAt] = useState("");
+  const [roomTypes, setRoomTypes] = useState<Array<{ name: string; price: string }>>([
+    { name: "غرفة لشخص واحد", price: "" },
+  ]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
@@ -113,6 +120,18 @@ export default function AddPlacePage() {
     setLongitude(lng);
   };
 
+  // لصق رابط Google Maps واستخراج الإحداثيات مباشرة عند توفرها داخل الرابط.
+  const handleMapsLinkChange = (value: string) => {
+    setMapsLink(value);
+    const coordinates = parseGoogleMapsLink(value);
+    if (coordinates) {
+      setLatitude(coordinates.lat);
+      setLongitude(coordinates.lng);
+      setMessage("✅ تم استخراج الإحداثيات من رابط Google Maps بنجاح.");
+      setIsSuccess(true);
+    }
+  };
+
   // معالجة الإدخال اليدوي للإحداثيات
   const handleManualCoordinateChange = (type: 'lat' | 'lng', value: string) => {
     const numValue = parseFloat(value);
@@ -128,9 +147,27 @@ export default function AddPlacePage() {
     setLoading(true);
     setMessage("");
 
-    if (!latitude || !longitude) {
+    if (latitude === null || longitude === null) {
       setIsSuccess(false);
-      setMessage("⚠️ يرجى تحديد موقع المعلم على الخريطة أو إدخال الإحداثيات يدوياً.");
+      setMessage("⚠️ يرجى تحديد موقع المعلم على الخريطة، لصق رابط Google Maps، أو إدخال الإحداثيات يدوياً.");
+      setLoading(false);
+      return;
+    }
+
+    const effectiveIsEvent = isEvent || category === "فعالية";
+    if (effectiveIsEvent && !eventEndsAt) {
+      setIsSuccess(false);
+      setMessage("⚠️ يرجى تحديد تاريخ ووقت انتهاء الفعالية.");
+      setLoading(false);
+      return;
+    }
+
+    const validRoomTypes = roomTypes
+      .map((room) => ({ name: room.name.trim(), price: Number(room.price) }))
+      .filter((room) => room.name && Number.isFinite(room.price) && room.price >= 0);
+    if (category === "فندق" && validRoomTypes.length === 0) {
+      setIsSuccess(false);
+      setMessage("⚠️ أضف نوع غرفة واحداً على الأقل مع سعره.");
       setLoading(false);
       return;
     }
@@ -143,6 +180,9 @@ export default function AddPlacePage() {
     formData.append("virtualTourUrl", virtualTourUrl);
     formData.append("latitude", latitude.toString());
     formData.append("longitude", longitude.toString());
+    formData.append("isEvent", effectiveIsEvent ? "1" : "0");
+    formData.append("eventEndsAt", effectiveIsEvent ? new Date(eventEndsAt).toISOString() : "");
+    formData.append("roomTypes", JSON.stringify(category === "فندق" ? validRoomTypes : []));
 
     if (image) {
       formData.append("image", image);
@@ -163,7 +203,11 @@ export default function AddPlacePage() {
         setDescription("");
         setPrice("");
         setImage(null);
-        setVirtualTourUrl(""); 
+        setVirtualTourUrl("");
+        setMapsLink("");
+        setIsEvent(false);
+        setEventEndsAt("");
+        setRoomTypes([{ name: "غرفة لشخص واحد", price: "" }]);
         setLatitude(null);
         setLongitude(null);
       } else {
@@ -287,7 +331,8 @@ export default function AddPlacePage() {
                 <option value="تاريخي">تاريخي وثقافي</option>
                 <option value="ترفيهي">ترفيهي ومغامرات</option>
                 <option value="طبيعي">طبيعي (شواطئ وغابات)</option>
-                <option value="فعالية">فعالية / مهرجان</option>
+                <option value="فعالية">فعالية / مهرجان / حفل</option>
+                <option value="فندق">فندق / إقامة</option>
               </select>
             </div>
             <div>
@@ -295,6 +340,38 @@ export default function AddPlacePage() {
               <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="اتركه فارغاً مجانياً" className="w-full rounded-lg border p-3 outline-none focus:border-blue-500" />
             </div>
           </div>
+
+          {/* 🎉 إعداد الفعاليات المؤقتة */}
+          <div className="rounded-xl border border-pink-100 bg-pink-50/60 p-4 space-y-3">
+            <label className="flex items-center gap-2 text-sm font-bold text-gray-800 cursor-pointer">
+              <input type="checkbox" checked={isEvent || category === "فعالية"} disabled={category === "فعالية"} onChange={(e) => setIsEvent(e.target.checked)} className="h-4 w-4 accent-pink-600" />
+              هذا إعلان فعالية أو تظاهرة قابلة للحجز
+            </label>
+            {(isEvent || category === "فعالية") && (
+              <div>
+                <label className="mb-2 flex items-center gap-1 text-xs font-bold text-pink-800"><CalendarDays size={15} /> تاريخ ووقت انتهاء الفعالية</label>
+                <input type="datetime-local" value={eventEndsAt} onChange={(e) => setEventEndsAt(e.target.value)} className="w-full rounded-lg border border-pink-200 bg-white p-3 outline-none focus:border-pink-500" required />
+                <p className="mt-1 text-[11px] text-pink-700">بعد هذا الموعد ستختفي الفعالية تلقائياً من صفحات الاستكشاف والحجز.</p>
+              </div>
+            )}
+          </div>
+
+          {/* 🛏️ إعداد أسعار الفندق حسب نوع الغرفة */}
+          {category === "فندق" && (
+            <div className="rounded-xl border border-cyan-100 bg-cyan-50/60 p-4 space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <label className="flex items-center gap-1 text-sm font-bold text-cyan-900"><BedDouble size={17} /> أنواع الغرف وأسعارها</label>
+                <button type="button" onClick={() => setRoomTypes((items) => [...items, { name: "", price: "" }])} className="inline-flex items-center gap-1 rounded-lg bg-cyan-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-cyan-700"><Plus size={14} /> إضافة نوع</button>
+              </div>
+              {roomTypes.map((room, index) => (
+                <div key={index} className="grid grid-cols-[1fr_120px_auto] gap-2">
+                  <input value={room.name} onChange={(e) => setRoomTypes((items) => items.map((item, i) => i === index ? { ...item, name: e.target.value } : item))} placeholder="مثال: جناح عائلي" className="rounded-lg border border-cyan-200 bg-white p-2.5 text-sm outline-none focus:border-cyan-500" />
+                  <input type="number" min="0" value={room.price} onChange={(e) => setRoomTypes((items) => items.map((item, i) => i === index ? { ...item, price: e.target.value } : item))} placeholder="السعر" className="rounded-lg border border-cyan-200 bg-white p-2.5 text-sm outline-none focus:border-cyan-500" />
+                  <button type="button" onClick={() => setRoomTypes((items) => items.filter((_, i) => i !== index))} className="rounded-lg p-2 text-red-500 hover:bg-red-50" aria-label="حذف نوع الغرفة"><Trash2 size={17} /></button>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="flex flex-col gap-2">
             <label className="text-sm font-bold text-gray-700">
@@ -324,6 +401,13 @@ export default function AddPlacePage() {
             </label>
             <p className="text-xs text-gray-500 mb-3">انقر على الخريطة لتثبيت الدبوس، أو أدخل الإحداثيات يدوياً من خرائط جوجل للحصول على دقة متناهية.</p>
             
+            {/* 🔗 رابط Google Maps المباشر */}
+            <div className="mb-4">
+              <label className="mb-1 flex items-center gap-1 text-[11px] font-bold text-gray-600"><Link2 size={14} /> رابط المكان من Google Maps</label>
+              <input type="url" value={mapsLink} onChange={(e) => handleMapsLinkChange(e.target.value)} placeholder="https://maps.google.com/... أو رابط مشاركة المكان" className="w-full rounded-lg border border-gray-300 p-3 text-sm outline-none focus:border-blue-500 text-left" dir="ltr" />
+              <p className="mt-1 text-[10px] text-gray-500">إذا كان الرابط المختصر لا يحتوي الإحداثيات، افتح المكان في المتصفح وانسخ الرابط الكامل.</p>
+            </div>
+
             {/* إدخال الإحداثيات يدوياً */}
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>

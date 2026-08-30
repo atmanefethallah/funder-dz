@@ -11,6 +11,7 @@ type PartnerBookingRow = {
   status: string;
   qrToken: string;
   createdAt: Date;
+  roomType: string | null;
   user_name: string;
   user_email: string;
   place_name: string;
@@ -25,7 +26,7 @@ export async function GET() {
     }
 
     const rows = await query<PartnerBookingRow>(
-      `SELECT b."id", b."userId", b."placeId", b."amount", b."status", b."qrToken", b."createdAt",
+      `SELECT b."id", b."userId", b."placeId", b."amount", b."status", b."qrToken", b."createdAt", b."roomType",
               u."name" AS "user_name", u."email" AS "user_email",
               p."name" AS "place_name"
        FROM "Booking" b
@@ -45,6 +46,7 @@ export async function GET() {
       status: r.status,
       qrToken: r.qrToken,
       createdAt: r.createdAt,
+      roomType: r.roomType,
       user: { name: r.user_name, email: r.user_email },
       place: { name: r.place_name },
     }));

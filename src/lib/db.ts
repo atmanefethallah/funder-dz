@@ -52,7 +52,7 @@ export async function queryOne<T extends QueryResultRow = Record<string, unknown
 
 /**
  * يشفّل مجموعة عمليات ضمن معاملة واحدة (BEGIN/COMMIT/ROLLBACK) لضمان الذرّة،
- * تماماً كما كان يفعل prisma.$transaction. مررر العميل (client) لإرسال
+ * كبديل مباشر وآمن للمعاملات التي كانت تُنفّذ عبر ORM. مررر العميل (client) لإرسال
  * الاستعلامات داخل المعاملة ذاتها.
  */
 export async function withTransaction<T>(

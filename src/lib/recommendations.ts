@@ -29,12 +29,15 @@ function serialize(p: PlaceWithReviewsRow): RecommendedPlace {
 }
 
 async function fetchPlacesWithReviews(whereSql: string, params: unknown[], limit: number): Promise<PlaceWithReviewsRow[]> {
+  const activeWhere = whereSql
+    ? `${whereSql} AND (p."isEvent" IS NOT TRUE OR p."eventEndsAt" IS NULL OR p."eventEndsAt" > NOW())`
+    : `WHERE (p."isEvent" IS NOT TRUE OR p."eventEndsAt" IS NULL OR p."eventEndsAt" > NOW())`;
   return query<PlaceWithReviewsRow>(
     `SELECT p."id", p."name", p."category", p."price", p."imageUrl",
             COALESCE(json_agg(json_build_object('rating', r."rating")) FILTER (WHERE r."id" IS NOT NULL), '[]') AS reviews
      FROM "Place" p
      LEFT JOIN "Review" r ON r."placeId" = p."id"
-     ${whereSql}
+     ${activeWhere}
      GROUP BY p."id"
      ORDER BY p."createdAt" DESC
      LIMIT ${limit}`,
@@ -73,6 +76,7 @@ export async function getRecommendations(userId: string | null, limit = 6): Prom
        FROM "Place" p
        LEFT JOIN "Review" r ON r."placeId" = p."id"
        WHERE p."category" = ANY($1::text[]) AND NOT (p."id" = ANY($2::text[]))
+         AND (p."isEvent" IS NOT TRUE OR p."eventEndsAt" IS NULL OR p."eventEndsAt" > NOW())
        GROUP BY p."id"
        ORDER BY p."createdAt" DESC
        LIMIT $3`,
@@ -89,6 +93,7 @@ export async function getRecommendations(userId: string | null, limit = 6): Prom
        FROM "Place" p
        LEFT JOIN "Review" r ON r."placeId" = p."id"
        WHERE NOT (p."id" = ANY($1::text[]))
+         AND (p."isEvent" IS NOT TRUE OR p."eventEndsAt" IS NULL OR p."eventEndsAt" > NOW())
        GROUP BY p."id"
        ORDER BY p."createdAt" DESC
        LIMIT $2`,

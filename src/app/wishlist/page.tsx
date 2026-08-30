@@ -40,6 +40,7 @@ export default async function WishlistPage() {
      JOIN "Place" p ON p."id" = w."placeId"
      LEFT JOIN "Review" r ON r."placeId" = p."id"
      WHERE w."userId" = $1
+       AND (p."isEvent" IS NOT TRUE OR p."eventEndsAt" IS NULL OR p."eventEndsAt" > NOW())
      GROUP BY w."id", p."id"
      ORDER BY w."createdAt" DESC`,
     [loggedInUserId],

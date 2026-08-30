@@ -16,8 +16,12 @@ type PlaceRow = {
 
 // جلب المعالم (الفعاليات) من الخادم
 async function getUpcomingEvents() {
-  // رتّبناها تنازلياً حسب المعرف لتجنب أي أخطاء في حال عدم وجود حقل date
-  return await query<PlaceRow>(`SELECT * FROM "Place" ORDER BY "id" DESC`);
+  // الفعاليات فقط، ولا تُعرض بعد انتهاء موعدها.
+  return await query<PlaceRow>(
+    `SELECT * FROM "Place"
+     WHERE "isEvent" IS TRUE AND ("eventEndsAt" IS NULL OR "eventEndsAt" > NOW())
+     ORDER BY "eventEndsAt" ASC NULLS LAST, "createdAt" DESC`,
+  );
 }
 
 export default async function EventsPage() {
@@ -54,7 +58,7 @@ export default async function EventsPage() {
                 userId={userId}
                 title={place.name}
                 placeName={place.category || "وجهة سياحية"} 
-                date={place.createdAt || new Date()} // 👈 تأمين الكود من أخطاء التاريخ
+                date={place.eventEndsAt || place.createdAt || new Date()} // موعد انتهاء الفعالية
                 price={place.price}
               />
             ))}

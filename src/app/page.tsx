@@ -29,6 +29,8 @@ type PlaceRow = {
   latitude: number | null;
   longitude: number | null;
   imageUrl: string | null;
+  isEvent: boolean | null;
+  eventEndsAt: Date | null;
 };
 
 export default async function HomePage() {
@@ -42,15 +44,17 @@ export default async function HomePage() {
   // 📥 جلب المعالم الحقيقية من قاعدة البيانات للخريطة
   // ⚠️ لا نترك خطأ اتصال قاعدة البيانات يُسقط الصفحة كاملة (Application error)؛
   // نعرض الصفحة بلا نقاط على الخريطة وسجل الخطأ في السيرفر لسهولة التتبع.
-  let realPlaces: Array<{ id: string; name: string; category: string; price: number; latitude: number | null; longitude: number | null; imageUrl: string | null }> = [];
+  let realPlaces: Array<{ id: string; name: string; category: string; price: number; latitude: number | null; longitude: number | null; imageUrl: string | null; isEvent: boolean | null; eventEndsAt: string | null }> = [];
   try {
     const rawPlaces = await query<PlaceRow>(
-      `SELECT "id", "name", "category", "price", "latitude", "longitude", "imageUrl"
-       FROM "Place" WHERE "latitude" IS NOT NULL AND "longitude" IS NOT NULL`,
+      `SELECT "id", "name", "category", "price", "latitude", "longitude", "imageUrl", "isEvent", "eventEndsAt"
+       FROM "Place"
+       WHERE "latitude" IS NOT NULL AND "longitude" IS NOT NULL
+         AND ("isEvent" IS NOT TRUE OR "eventEndsAt" IS NULL OR "eventEndsAt" > NOW())`, 
     );
 
     // تحويل Decimal إلى Number قبل التمرير لمكونات العميل (Client Components)
-    realPlaces = rawPlaces.map((p) => ({ ...p, price: Number(p.price) }));
+    realPlaces = rawPlaces.map((p) => ({ ...p, price: Number(p.price), eventEndsAt: p.eventEndsAt ? p.eventEndsAt.toISOString() : null }));
   } catch (error) {
     console.error("❌ فشل الاتصال بقاعدة البيانات في الصفحة الرئيسية:", error);
   }
@@ -129,6 +133,23 @@ export default async function HomePage() {
           </div>
           
           <MapComponent places={realPlaces as any} isLoggedIn={isLoggedIn} />
+        </div>
+      </section>
+
+      {/* 📊 مؤشرات ثقة سريعة تضيف وضوحاً وجمالية للواجهة الرئيسية */}
+      <section className="relative z-10 px-4 pb-14">
+        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-3 rounded-3xl border border-white/70 bg-white/85 p-4 shadow-xl shadow-blue-900/5 backdrop-blur md:grid-cols-4 md:p-6">
+          {[
+            [String(realPlaces.length), "وجهة على الخريطة"],
+            ["360°", "جولات افتراضية"],
+            ["24/7", "حجز رقمي آمن"],
+            ["QR", "تذاكر فورية"],
+          ].map(([value, label]) => (
+            <div key={label} className="rounded-2xl bg-gradient-to-br from-gray-50 to-blue-50/60 p-4 text-center">
+              <p className="text-2xl font-black text-blue-600">{value}</p>
+              <p className="mt-1 text-xs font-bold text-gray-500">{label}</p>
+            </div>
+          ))}
         </div>
       </section>
 

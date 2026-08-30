@@ -7,8 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:seed": "node prisma/seed.js",
-    "db:migrate:p0": "psql \"$DIRECT_URL\" -f prisma/migrations/0001_p0_security_hardening/migration.sql"
+    "db:seed": "node scripts/seed.js",
+    "db:migrate:p0": "node scripts/run-migration.js supabase/migrations/0001_p0_security_hardening/migration.sql",
+    "db:migrate:latest": "node scripts/run-migration.js supabase/APPLY_LATEST_FEATURES.sql"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",

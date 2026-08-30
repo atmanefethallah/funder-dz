@@ -44,6 +44,14 @@ const CATEGORY_MAP: Record<string, CategoryMeta> = {
     textClass: "text-pink-700",
     borderClass: "border-pink-500",
   },
+  "فندق": {
+    emoji: "🏨",
+    label: "فندق وإقامة",
+    color: "#0891b2",
+    bgClass: "bg-cyan-50",
+    textClass: "text-cyan-700",
+    borderClass: "border-cyan-500",
+  },
   // توافق مع تصنيفات قديمة محتملة في قاعدة البيانات
   "CULTURAL": {
     emoji: "🏛️",

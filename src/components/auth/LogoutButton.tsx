@@ -3,7 +3,7 @@
 import { signOut } from "next-auth/react";
 import { LogOut } from "lucide-react";
 
-/** زر تسجيل الخروج — يدمّر جلسة NextAuth الموقّعة (بديل كوكي user_session اليدوي) */
+/** زر تسجيل الخروج — أيقونة فقط بدل النص، يدمّر جلسة NextAuth الموقّعة */
 export default function LogoutButton({
   variant = "desktop",
 }: {
@@ -13,10 +13,11 @@ export default function LogoutButton({
     return (
       <button
         onClick={() => signOut({ callbackUrl: "/" })}
+        aria-label="تسجيل الخروج"
+        title="تسجيل الخروج"
         className="flex flex-col items-center gap-1 text-gray-400 hover:text-red-500 transition active:scale-95"
       >
         <LogOut size={24} />
-        <span className="text-[10px] font-bold">خروج</span>
       </button>
     );
   }
@@ -24,9 +25,11 @@ export default function LogoutButton({
   return (
     <button
       onClick={() => signOut({ callbackUrl: "/" })}
-      className="text-sm font-bold text-red-500 hover:underline flex items-center gap-1"
+      aria-label="تسجيل الخروج"
+      title="تسجيل الخروج"
+      className="flex items-center justify-center rounded-full bg-red-50 p-2 text-red-500 transition hover:bg-red-100 hover:scale-105 border border-red-100 shadow-sm"
     >
-      <LogOut size={16} /> خروج
+      <LogOut size={18} />
     </button>
   );
 }

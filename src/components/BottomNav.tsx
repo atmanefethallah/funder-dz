@@ -76,7 +76,7 @@ export default function BottomNav({ userRole }: { userRole?: string | null }) {
           <span className="text-[10px] font-black text-blue-600 mt-1">إضافة معلم</span>
         </Link>
 
-        <Link href="/partner/scanner" className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${pathname === "/partner/scanner" ? "text-blue-600" : "text-gray-400 hover:text-gray-600"}`}>
+        <Link href="/partner" className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${pathname === "/partner" ? "text-blue-600" : "text-gray-400 hover:text-gray-600"}`}>
           <ScanLine size={22} />
           <span className="text-[10px] font-bold">الماسح</span>
         </Link>

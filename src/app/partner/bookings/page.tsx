@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, Check, X, Ticket } from "lucide-react";
+import Link from "next/link";
+import { Loader2, Check, X, Ticket, BedDouble, LayoutDashboard } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 
 export default function PartnerBookingsPage() {
@@ -51,9 +52,14 @@ export default function PartnerBookingsPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-        <Ticket size={28} className="text-blue-600" /> إدارة طلبات الحجوزات 
-      </h1>
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+        <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+          <Ticket size={28} className="text-blue-600" /> إدارة طلبات الحجوزات 
+        </h1>
+        <Link href="/partner-dashboard" className="flex items-center gap-2 bg-gray-900 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-gray-800 transition">
+          <LayoutDashboard size={16} /> لوحة تحكمي الكاملة
+        </Link>
+      </div>
       
       <div className="bg-white rounded-2xl border p-6 shadow-sm">
         {bookings.length === 0 ? (
@@ -69,6 +75,9 @@ export default function PartnerBookingsPage() {
                   <h4 className="font-bold text-gray-800 text-lg">{b.place.name}</h4>
                   <p className="text-sm text-gray-600 mt-1">السائح: <span className="font-medium">{b.user.name}</span> ({b.user.email})</p>
                   <p className="text-sm text-blue-600 font-bold mt-2">العربون المدفوع: {b.amount} د.ج</p>
+                  {b.roomType && (
+                    <p className="text-xs text-cyan-700 font-bold mt-1 flex items-center gap-1"><BedDouble size={13} /> نوع الغرفة: {b.roomType}</p>
+                  )}
                   <p className="text-xs text-gray-500">تاريخ الطلب: {new Date(b.createdAt).toLocaleDateString("ar-DZ")}</p>
                 </div>
                 

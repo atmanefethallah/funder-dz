@@ -15,7 +15,7 @@ export default function SearchFilterBar() {
   const [q, setQ] = useState(initialQ);
   const [category, setCategory] = useState(initialCategory);
 
-  const categories = ["الكل", "تاريخي", "ترفيهي", "طبيعي", "فعالية"];
+  const categories = ["الكل", "تاريخي", "ترفيهي", "طبيعي", "فعالية", "فندق"];
 
   // تحديث الرابط برمجياً عند البحث أو تغيير التصنيف
   const updateUrl = (searchQuery: string, selectedCategory: string) => {

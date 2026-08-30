@@ -29,6 +29,8 @@ type ExplorePlaceRow = {
   latitude: number | null;
   longitude: number | null;
   reviews: Array<{ rating: number }>;
+  isEvent: boolean | null;
+  eventEndsAt: Date | null;
 };
 
 export default async function ExplorePage({ searchParams }: { searchParams: { q?: string, category?: string } }) {
@@ -48,7 +50,8 @@ export default async function ExplorePage({ searchParams }: { searchParams: { q?
     userWishlistIds = wishlists.map((w) => w.placeId);
   }
 
-  const conditions: string[] = [];
+  // شرط دائم: إخفاء الإعلانات والفعاليات المنتهية تلقائياً.
+  const conditions: string[] = [`(p."isEvent" IS NOT TRUE OR p."eventEndsAt" IS NULL OR p."eventEndsAt" > NOW())`];
   const params: unknown[] = [];
   if (searchParams.category && searchParams.category !== "الكل") {
     params.push(searchParams.category);
@@ -58,7 +61,7 @@ export default async function ExplorePage({ searchParams }: { searchParams: { q?
     params.push(`%${searchParams.q}%`);
     conditions.push(`p."name" LIKE $${params.length}`);
   }
-  const whereSql = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+  const whereSql = `WHERE ${conditions.join(" AND ")}`;
 
   const rawPlaces = await query<ExplorePlaceRow>(
     `SELECT p.*, COALESCE(json_agg(json_build_object('rating', r."rating")) FILTER (WHERE r."id" IS NOT NULL), '[]') AS reviews
@@ -146,11 +149,11 @@ export default async function ExplorePage({ searchParams }: { searchParams: { q?
                         {place.category}
                       </span>
 
-                      {isPlaceFree && (
-                        <span className="absolute left-3 top-3 rounded-md bg-green-500 px-2 py-0.5 text-[10px] font-black text-white shadow-sm">
-                          مجاني
-                        </span>
-                      )}
+                      {place.isEvent ? (
+                        <span className="absolute left-3 top-3 rounded-md bg-pink-600 px-2 py-0.5 text-[10px] font-black text-white shadow-sm">🎉 فعالية مؤقتة</span>
+                      ) : isPlaceFree ? (
+                        <span className="absolute left-3 top-3 rounded-md bg-green-500 px-2 py-0.5 text-[10px] font-black text-white shadow-sm">مجاني</span>
+                      ) : null}
                     </div>
                     
                     {/* النصوص والأزرار */}

@@ -20,7 +20,8 @@ type MapPlaceRow = {
 
 async function getMapPlaces() {
   const places = await query<MapPlaceRow>(
-    `SELECT "id", "name", "category", "latitude", "longitude" FROM "Place"`,
+    `SELECT "id", "name", "category", "latitude", "longitude" FROM "Place"
+     WHERE ("isEvent" IS NOT TRUE OR "eventEndsAt" IS NULL OR "eventEndsAt" > NOW())`,
   );
   return places;
 }

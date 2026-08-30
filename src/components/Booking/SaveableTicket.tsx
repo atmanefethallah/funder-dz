@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { MapPin, Calendar, Users, ShieldCheck, Download, Loader2, Navigation } from "lucide-react";
+import { MapPin, Calendar, Users, ShieldCheck, Download, Loader2, Navigation, BedDouble } from "lucide-react";
 import TicketQRCode from "./TicketQRCode";
 
 type Props = {
@@ -9,6 +9,7 @@ type Props = {
   placeName: string;
   status: string;
   ticketsCount: number;
+  roomType?: string | null;
   qrToken: string;
   mapsHref: string | null;
 };
@@ -23,6 +24,7 @@ export default function SaveableTicket({
   placeName,
   status,
   ticketsCount,
+  roomType,
   qrToken,
   mapsHref,
 }: Props) {
@@ -84,6 +86,12 @@ export default function SaveableTicket({
                 {status === 'USED' ? "مُستخدمة" : status === 'REJECTED' ? "مرفوضة" : "صالحة للاستخدام"}
               </p>
             </div>
+            {roomType && (
+              <div className="col-span-2 pt-2 border-t border-gray-100">
+                <p className="text-[10px] text-gray-400 font-bold flex items-center gap-1 mb-1"><BedDouble size={12} /> نوع الغرفة</p>
+                <p className="text-sm font-black text-cyan-700">{roomType}</p>
+              </div>
+            )}
           </div>
         </div>
 

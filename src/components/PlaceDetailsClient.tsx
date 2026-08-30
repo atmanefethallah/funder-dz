@@ -2,9 +2,19 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { MapPin, Calendar, Users, Glasses, ShieldCheck, Loader2, ArrowRight, Star } from "lucide-react";
+import { MapPin, Calendar, Users, Glasses, ShieldCheck, Loader2, ArrowRight, Star, BadgeCheck, BedDouble, Clock } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/components/ui/Toast";
+
+type ReviewType = {
+  id: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+  userName: string;
+};
+
+type RoomTypeOption = { name: string; price: number };
 
 type PlaceType = {
   id: string;
@@ -16,17 +26,24 @@ type PlaceType = {
   virtualTourUrl?: string | null;
   latitude?: number | null;
   longitude?: number | null;
-  user: { name: string };
+  isEvent?: boolean | null;
+  eventEndsAt?: string | null;
+  roomTypes?: RoomTypeOption[] | null;
+  user: { id?: string | null; name: string; verificationStatus?: string | null };
 };
 
 export default function PlaceDetailsClient({ 
   place, 
   isLoggedIn, 
-  canReview = false // 👈 استقبال صلاحية التقييم من السيرفر
+  canReview = false, // 👈 استقبال صلاحية التقييم من السيرفر
+  reviews = [],
+  averageRating = 0,
 }: { 
   place: PlaceType; 
   isLoggedIn: boolean; 
   canReview?: boolean;
+  reviews?: ReviewType[];
+  averageRating?: number;
 }) {
   const router = useRouter();
   const { success, error: toastError, warning } = useToast();
@@ -35,6 +52,10 @@ export default function PlaceDetailsClient({
   const [ticketCount, setTicketCount] = useState(1);
   const [loading, setLoading] = useState(false);
   const [showTour, setShowTour] = useState(false); 
+  const hasRoomTypes = Array.isArray(place.roomTypes) && place.roomTypes.length > 0;
+  const [selectedRoomType, setSelectedRoomType] = useState<string | null>(
+    hasRoomTypes ? place.roomTypes![0].name : null,
+  );
 
   // حالات التقييم
   const [rating, setRating] = useState(0);
@@ -43,13 +64,24 @@ export default function PlaceDetailsClient({
   const [reviewLoading, setReviewLoading] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState(false);
 
-  const totalPrice = place.price * ticketCount;
+  // 🛏️ السعر الفعلي حسب نوع الغرفة المختار (إن وُجد) أو السعر الأساسي
+  const unitPrice = hasRoomTypes
+    ? place.roomTypes!.find((rt) => rt.name === selectedRoomType)?.price ?? place.price
+    : place.price;
+  const totalPrice = unitPrice * ticketCount;
 
-  // رابط الملاحة المباشر لموقع المعلم الدقيق حسب الإدّحيات التي وضعها الشريك
+  // رابط الملاحة المباشر لموقع المعلم الدقيق حسب الإحداثيات التي وضعها الشريك
   const hasCoords = place.latitude != null && place.longitude != null;
   const mapsHref = hasCoords
     ? `https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`
     : "/map";
+
+  // ⏳ العد التنازلي لانتهاء الفعالية (إن كانت هذه فعالية مؤقتة)
+  const eventEndsLabel = place.isEvent && place.eventEndsAt
+    ? new Date(place.eventEndsAt).toLocaleString("ar-DZ", { dateStyle: "medium", timeStyle: "short" })
+    : null;
+
+  const isVerifiedPartner = place.user?.verificationStatus === "VERIFIED";
 
   // 🚀 دالة الحجز للمعالم المدفوعة
   const handleBooking = async () => {
@@ -67,6 +99,7 @@ export default function PlaceDetailsClient({
           placeId: place.id,
           tickets: ticketCount,
           totalAmount: totalPrice,
+          roomType: hasRoomTypes ? selectedRoomType : undefined,
         }),
       });
 
@@ -92,7 +125,6 @@ export default function PlaceDetailsClient({
     }
     setReviewLoading(true);
     try {
-      // نفترض أنك ستنشئ (أو تملك) مسار /api/reviews
       const response = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -105,6 +137,7 @@ export default function PlaceDetailsClient({
 
       if (response.ok) {
         setReviewSuccess(true);
+        router.refresh();
       } else {
         toastError("فشل إرسال التقييم", "حدث خطأ أثناء إرسال التقييم.");
       }
@@ -137,6 +170,11 @@ export default function PlaceDetailsClient({
           <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-black text-blue-600 shadow-sm border border-white/20">
             {place.category}
           </div>
+          {place.isEvent && (
+            <div className="absolute top-4 left-4 bg-pink-600/90 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-black text-white shadow-sm flex items-center gap-1">
+              <Clock size={14} /> فعالية مؤقتة{eventEndsLabel ? ` — تنتهي ${eventEndsLabel}` : ""}
+            </div>
+          )}
         </div>
 
         {/* 🧱 تخطيط الصفحة: عمودين */}
@@ -147,13 +185,35 @@ export default function PlaceDetailsClient({
             
             {/* قسم التفاصيل */}
             <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-              <h1 className="text-3xl font-black text-gray-900 mb-3">{place.name}</h1>
+              <div className="flex items-start justify-between flex-wrap gap-2 mb-3">
+                <h1 className="text-3xl font-black text-gray-900">{place.name}</h1>
+                {reviews.length > 0 && (
+                  <div className="flex items-center gap-1 text-sm font-black text-yellow-600 bg-yellow-50 px-3 py-1.5 rounded-full border border-yellow-100">
+                    <Star size={16} className="fill-yellow-400 text-yellow-400" /> {averageRating}
+                    <span className="text-gray-400 font-medium">({reviews.length} تقييم)</span>
+                  </div>
+                )}
+              </div>
               
-              <div className="flex items-center gap-2 text-sm text-gray-500 mb-6 font-medium">
+              <div className="flex items-center gap-2 text-sm text-gray-500 mb-6 font-medium flex-wrap">
                 <MapPin size={16} className="text-blue-500" />
                 <span>مستغانم، الجزائر</span>
                 <span className="text-gray-300">•</span>
-                <span>بواسطة: <strong className="text-gray-700">{place.user?.name || "منصة Funder"}</strong></span>
+                <span className="flex items-center gap-1.5">
+                  بواسطة:{" "}
+                  {place.user?.id ? (
+                    <Link href={`/partners/${place.user.id}`} className="font-bold text-gray-700 hover:text-blue-600 hover:underline transition">
+                      {place.user?.name || "منصة Funder"}
+                    </Link>
+                  ) : (
+                    <strong className="text-gray-700">{place.user?.name || "منصة Funder"}</strong>
+                  )}
+                  {isVerifiedPartner && (
+                    <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-600 text-[10px] font-black px-2 py-0.5 rounded-full border border-blue-100">
+                      <BadgeCheck size={12} className="fill-blue-100" /> موثّق
+                    </span>
+                  )}
+                </span>
               </div>
 
               <hr className="border-gray-100 my-6" />
@@ -181,6 +241,29 @@ export default function PlaceDetailsClient({
                 </div>
               )}
             </div>
+
+            {/* 💬 قسم آراء الزوّار — يظهر دائماً إن وُجدت تعليقات سابقة */}
+            {reviews.length > 0 && (
+              <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+                <h2 className="text-xl font-black text-gray-900 mb-6">آراء الزوّار 💬</h2>
+                <div className="space-y-5">
+                  {reviews.map((r) => (
+                    <div key={r.id} className="border-b border-gray-50 last:border-0 pb-5 last:pb-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-bold text-gray-800 text-sm">{r.userName}</span>
+                        <div className="flex items-center gap-0.5">
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <Star key={s} size={14} className={s <= r.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-200"} />
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-400 mb-2">{new Date(r.createdAt).toLocaleDateString("ar-DZ")}</p>
+                      {r.comment && <p className="text-sm text-gray-600 leading-relaxed">{r.comment}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* ⭐️ قسم التقييم الذكي: يظهر فقط إذا كان مسموحاً له بالتقييم */}
             {canReview && (
@@ -237,7 +320,7 @@ export default function PlaceDetailsClient({
 
           {/* 🎫 العمود الأيسر: صندوق الحجز التكيفي (مجاني / مدفوع) */}
           <div className="lg:sticky lg:top-6">
-            {place.price === 0 ? (
+            {place.price === 0 && !hasRoomTypes && !place.isEvent ? (
               // 🌿 واجهة المعلم المجاني
               <div className="bg-white border border-green-100 rounded-3xl p-6 shadow-md text-center">
                 <div className="w-16 h-16 bg-green-50 text-green-500 rounded-full mx-auto flex items-center justify-center mb-4">
@@ -262,22 +345,48 @@ export default function PlaceDetailsClient({
                 )}
               </div>
             ) : (
-              // 🎫 واجهة الحجز للمعلم المدفوع
+              // 🎫 واجهة الحجز للمعلم المدفوع (أو الفعالية / الفندق بغرف متعددة)
               <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-md">
                 <div className="flex justify-between items-baseline mb-6">
-                  <span className="text-xs font-bold text-gray-400">سعر التذكرة</span>
+                  <span className="text-xs font-bold text-gray-400">{hasRoomTypes ? "سعر الغرفة المختارة" : "سعر التذكرة"}</span>
                   <div>
-                    <span className="text-2xl font-black text-gray-900">{place.price}</span>
-                    <span className="text-xs font-bold text-gray-500 mr-1">د.ج / شخص</span>
+                    <span className="text-2xl font-black text-gray-900">{unitPrice}</span>
+                    <span className="text-xs font-bold text-gray-500 mr-1">د.ج {hasRoomTypes ? "/ ليلة" : "/ شخص"}</span>
                   </div>
                 </div>
 
                 <hr className="border-gray-100 my-4" />
 
+                {/* 🛏️ محدد نوع الغرفة (للفنادق فقط) */}
+                {hasRoomTypes && (
+                  <div className="space-y-2 mb-6">
+                    <label className="text-xs font-bold text-gray-700 flex items-center gap-1">
+                      <BedDouble size={14} className="text-gray-400" /> اختر نوع الغرفة
+                    </label>
+                    <div className="grid grid-cols-1 gap-2">
+                      {place.roomTypes!.map((rt) => (
+                        <button
+                          key={rt.name}
+                          type="button"
+                          onClick={() => setSelectedRoomType(rt.name)}
+                          className={`flex items-center justify-between rounded-xl border p-3 text-sm font-bold transition ${
+                            selectedRoomType === rt.name
+                              ? "border-cyan-500 bg-cyan-50 text-cyan-700"
+                              : "border-gray-200 text-gray-600 hover:border-gray-300"
+                          }`}
+                        >
+                          <span>{rt.name}</span>
+                          <span>{rt.price} د.ج</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* محدد عدد التذاكر */}
                 <div className="space-y-3 mb-6">
                   <label className="text-xs font-bold text-gray-700 flex items-center gap-1">
-                    <Users size={14} className="text-gray-400" /> عدد الأشخاص
+                    <Users size={14} className="text-gray-400" /> {hasRoomTypes ? "عدد الغرف" : "عدد الأشخاص"}
                   </label>
                   <div className="flex items-center justify-between border border-gray-200 rounded-xl p-2 bg-gray-50">
                     <button 
@@ -299,7 +408,7 @@ export default function PlaceDetailsClient({
                 {/* الحساب الإجمالي */}
                 <div className="bg-gray-50 rounded-xl p-4 space-y-2 mb-6 text-sm">
                   <div className="flex justify-between text-gray-500">
-                    <span>حساب التذاكر ({ticketCount})</span>
+                    <span>{hasRoomTypes ? `حساب الغرف (${ticketCount})` : `حساب التذاكر (${ticketCount})`}</span>
                     <span>{totalPrice} د.ج</span>
                   </div>
                   <div className="flex justify-between text-gray-500">

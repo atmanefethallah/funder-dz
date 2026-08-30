@@ -58,6 +58,7 @@ export async function POST(request: Request) {
               COALESCE(json_agg(json_build_object('rating', r."rating")) FILTER (WHERE r."id" IS NOT NULL), '[]') AS reviews
        FROM "Place" p
        LEFT JOIN "Review" r ON r."placeId" = p."id"
+       WHERE (p."isEvent" IS NOT TRUE OR p."eventEndsAt" IS NULL OR p."eventEndsAt" > NOW())
        GROUP BY p."id"`,
     );
 
