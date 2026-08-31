@@ -1,35 +1,31 @@
 "use client";
 
+import { useState } from "react";
 import { signOut } from "next-auth/react";
-import { LogOut } from "lucide-react";
+import { LogOut, Loader2 } from "lucide-react";
 
-/** زر تسجيل الخروج — أيقونة فقط بدل النص، يدمّر جلسة NextAuth الموقّعة */
-export default function LogoutButton({
-  variant = "desktop",
-}: {
-  variant?: "desktop" | "mobile";
-}) {
-  if (variant === "mobile") {
-    return (
-      <button
-        onClick={() => signOut({ callbackUrl: "/" })}
-        aria-label="تسجيل الخروج"
-        title="تسجيل الخروج"
-        className="flex flex-col items-center gap-1 text-gray-400 hover:text-red-500 transition active:scale-95"
-      >
-        <LogOut size={24} />
-      </button>
-    );
-  }
+/** أيقونة خروج موحّدة، تمنع النقر المتكرر أثناء إنهاء الجلسة. */
+export default function LogoutButton({ variant = "desktop" }: { variant?: "desktop" | "mobile" }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleLogout = async () => {
+    if (loading) return;
+    setLoading(true);
+    await signOut({ callbackUrl: "/" });
+  };
 
   return (
     <button
-      onClick={() => signOut({ callbackUrl: "/" })}
+      type="button"
+      onClick={handleLogout}
+      disabled={loading}
       aria-label="تسجيل الخروج"
       title="تسجيل الخروج"
-      className="flex items-center justify-center rounded-full bg-red-50 p-2 text-red-500 transition hover:bg-red-100 hover:scale-105 border border-red-100 shadow-sm"
+      className={variant === "mobile"
+        ? "flex min-h-11 min-w-11 flex-col items-center justify-center gap-1 rounded-xl text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500 disabled:opacity-50 touch-manipulation"
+        : "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-red-100 bg-red-50 text-red-500 shadow-sm transition-colors hover:bg-red-100 disabled:opacity-50 touch-manipulation"}
     >
-      <LogOut size={18} />
+      {loading ? <Loader2 size={19} className="animate-spin" /> : <LogOut size={variant === "mobile" ? 23 : 19} />}
     </button>
   );
 }

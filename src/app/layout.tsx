@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cairo } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
@@ -6,6 +6,7 @@ import BottomNav from "@/components/BottomNav";
 import { getSessionUser } from "@/lib/session";
 import { ToastProvider } from "@/components/ui/Toast";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import InteractionLock from "@/components/InteractionLock";
 
 const cairo = Cairo({ subsets: ["latin", "arabic"] });
 
@@ -13,6 +14,15 @@ export const metadata: Metadata = {
   title: "Funder - منصتك السياحية",
   description: "اكتشف واحجز أفضل المعالم السياحية في مستغانم",
   manifest: "/manifest.json",
+};
+
+// تثبيت مقياس واجهة الهاتف ومنع تكبير الشاشة بالإيماءات.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
 };
 
 export default async function RootLayout({
@@ -29,6 +39,7 @@ export default async function RootLayout({
       <head></head>
       <body className={`${cairo.className} pb-16 md:pb-0`}>
         <ServiceWorkerRegister />
+        <InteractionLock />
         <ToastProvider>
           {/* شريط التنقل العلوي */}
           <Navbar />

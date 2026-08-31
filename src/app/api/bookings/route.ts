@@ -48,8 +48,8 @@ export async function POST(req: Request) {
       );
       const place = placeRes.rows[0];
       if (!place) throw new Error("المعلم غير موجود");
-      if (place.isEvent && place.eventEndsAt && new Date(place.eventEndsAt) <= new Date()) {
-        throw new Error("انتهت هذه الفعالية ولم يعد الحجز متاحاً");
+      if (place.isEvent && (!place.eventEndsAt || new Date(place.eventEndsAt) <= new Date())) {
+        throw new Error("انتهت هذه الفعالية أو لا تملك موعد انتهاء صالحاً");
       }
 
       const roomTypes = Array.isArray(place.roomTypes) ? place.roomTypes : [];

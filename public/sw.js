@@ -1,7 +1,7 @@
 // public/sw.js — عامل الخدمة: تخزين مؤقت للاستخدام دون اتصال + استقبال الإشعارات الفورية
 /* eslint-disable no-restricted-globals */
 
-const CACHE_NAME = "funder-cache-v1";
+const CACHE_NAME = "funder-cache-v2";
 const APP_SHELL = ["/", "/explore", "/manifest.json"];
 
 // 📥 عند التثبيت: خزّن هيكل التطبيق
@@ -47,16 +47,14 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // الصفحات: شبكة أولاً مع رجوع للذخيرة عند انقطاع الاتصال
-  event.respondWith(
-    fetch(request)
-      .then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-        return res;
-      })
-      .catch(() => caches.match(request).then((cached) => cached || caches.match("/")))
-  );
+  // التنقلات: الشبكة مباشرة لمنع عرض واجهات قديمة أو تأخير الانتقال بسبب التخزين المؤقت.
+  // عند انقطاع الاتصال فقط نرجع إلى النسخة المحفوظة.
+  if (request.mode === "navigate") {
+    event.respondWith(fetch(request).catch(() => caches.match(request).then((cached) => cached || caches.match("/"))));
+    return;
+  }
+
+  event.respondWith(fetch(request));
 });
 
 // 🔔 استقبال الإشعارات الفورية (Web Push)
