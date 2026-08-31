@@ -2,7 +2,17 @@ import { query } from "@/lib/db";
 import { getSessionUser } from "@/lib/session";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { TrendingUp, Users, Ticket, MapPin, Edit2, PlusCircle } from "lucide-react";
+import {
+  TrendingUp,
+  Users,
+  Ticket,
+  MapPin,
+  Edit2,
+  PlusCircle,
+  BedDouble,
+  CalendarDays,
+  Megaphone,
+} from "lucide-react";
 
 type PartnerPlaceRow = {
   id: string;
@@ -69,8 +79,12 @@ export default async function PartnerDashboardPage() {
       {/* الترويسة */}
       <div className="bg-blue-900 py-12 text-white">
         <div className="mx-auto max-w-6xl px-4">
-          <h1 className="text-3xl font-bold mb-2">مرحباً بك يا {user.name} 👋</h1>
-          <p className="text-blue-200">هنا نظرة عامة على أداء معالمك السياحية ومبيعاتك</p>
+          <h1 className="text-3xl font-bold mb-2">
+            مرحباً بك يا {user.name} 👋
+          </h1>
+          <p className="text-blue-200">
+            هنا نظرة عامة على أداء معالمك السياحية ومبيعاتك
+          </p>
         </div>
       </div>
 
@@ -79,48 +93,101 @@ export default async function PartnerDashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <div className="bg-white rounded-2xl p-6 border shadow-sm flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 font-bold mb-1">إجمالي الأرباح المتوقعة</p>
-              <p className="text-3xl font-black text-green-600" dir="ltr">{totalRevenue} د.ج</p>
+              <p className="text-sm text-gray-500 font-bold mb-1">
+                إجمالي الأرباح المتوقعة
+              </p>
+              <p className="text-3xl font-black text-green-600" dir="ltr">
+                {totalRevenue} د.ج
+              </p>
             </div>
-            <div className="bg-green-100 p-4 rounded-xl text-green-600"><TrendingUp size={32} /></div>
-          </div>
-          
-          <div className="bg-white rounded-2xl p-6 border shadow-sm flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500 font-bold mb-1">التذاكر المباعة</p>
-              <p className="text-3xl font-black text-blue-600">{totalTickets}</p>
+            <div className="bg-green-100 p-4 rounded-xl text-green-600">
+              <TrendingUp size={32} />
             </div>
-            <div className="bg-blue-100 p-4 rounded-xl text-blue-600"><Ticket size={32} /></div>
           </div>
 
           <div className="bg-white rounded-2xl p-6 border shadow-sm flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 font-bold mb-1">الزوار الفعليون (تذاكر مستخدمة)</p>
-              <p className="text-3xl font-black text-purple-600">{usedTickets}</p>
+              <p className="text-sm text-gray-500 font-bold mb-1">
+                التذاكر المباعة
+              </p>
+              <p className="text-3xl font-black text-blue-600">
+                {totalTickets}
+              </p>
             </div>
-            <div className="bg-purple-100 p-4 rounded-xl text-purple-600"><Users size={32} /></div>
+            <div className="bg-blue-100 p-4 rounded-xl text-blue-600">
+              <Ticket size={32} />
+            </div>
           </div>
+
+          <div className="bg-white rounded-2xl p-6 border shadow-sm flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500 font-bold mb-1">
+                الزوار الفعليون (تذاكر مستخدمة)
+              </p>
+              <p className="text-3xl font-black text-purple-600">
+                {usedTickets}
+              </p>
+            </div>
+            <div className="bg-purple-100 p-4 rounded-xl text-purple-600">
+              <Users size={32} />
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-10 grid gap-3 md:grid-cols-3">
+          <Link
+            href="/partner-dashboard/properties/new"
+            className="flex items-center gap-3 rounded-2xl border bg-white p-4 font-black text-blue-700 shadow-sm hover:border-blue-300"
+          >
+            <BedDouble /> إضافة فندق / إقامة
+          </Link>
+          <Link
+            href="/partner-dashboard/events/new"
+            className="flex items-center gap-3 rounded-2xl border bg-white p-4 font-black text-pink-700 shadow-sm hover:border-pink-300"
+          >
+            <CalendarDays /> إنشاء فعالية
+          </Link>
+          <Link
+            href="/partner-dashboard/promote"
+            className="flex items-center gap-3 rounded-2xl border bg-white p-4 font-black text-amber-700 shadow-sm hover:border-amber-300"
+          >
+            <Megaphone /> Funder Promote
+          </Link>
         </div>
 
         {/* 🗺️ إدارة المعالم */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">معالمي السياحية ({myPlaces.length})</h2>
-          <Link href="/add-place" className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition">
+          <h2 className="text-2xl font-bold text-gray-800">
+            معالمي السياحية ({myPlaces.length})
+          </h2>
+          <Link
+            href="/add-place"
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition"
+          >
             <PlusCircle size={18} /> إضافة معلم جديد
           </Link>
         </div>
 
         {myPlaces.length === 0 ? (
           <div className="text-center bg-white p-12 rounded-2xl border border-dashed border-gray-300">
-            <p className="text-gray-500 mb-4">لم تقم بإضافة أي معالم سياحية بعد.</p>
+            <p className="text-gray-500 mb-4">
+              لم تقم بإضافة أي معالم سياحية بعد.
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {myPlaces.map((place) => (
-              <div key={place.id} className="bg-white rounded-2xl border shadow-sm overflow-hidden flex flex-col sm:flex-row">
+              <div
+                key={place.id}
+                className="bg-white rounded-2xl border shadow-sm overflow-hidden flex flex-col sm:flex-row"
+              >
                 <div className="w-full sm:w-40 h-40 bg-gray-100 relative shrink-0">
                   {place.imageUrl ? (
-                    <img src={place.imageUrl} alt={place.name} className="w-full h-full object-cover" />
+                    <img
+                      src={place.imageUrl}
+                      alt={place.name}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400">
                       <MapPin size={32} />
@@ -130,17 +197,27 @@ export default async function PartnerDashboardPage() {
                     {place.category}
                   </span>
                 </div>
-                
+
                 <div className="p-4 flex flex-col flex-1 justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-gray-800 mb-1">{place.name}</h3>
+                    <h3 className="text-lg font-bold text-gray-800 mb-1">
+                      {place.name}
+                    </h3>
                     <p className="text-sm text-gray-500 mb-2">
-                      ⭐ {place.reviews.length} تقييمات | 🎫 {place.bookings.length} تذكرة مباعة
+                      ⭐ {place.reviews.length} تقييمات | 🎫{" "}
+                      {place.bookings.length} تذكرة مباعة
                     </p>
                   </div>
                   <div className="flex items-center justify-between mt-4">
-                    <span className="font-bold text-blue-600" dir="ltr">{Number(place.price) > 0 ? `${Number(place.price)} د.ج` : "مجاني"}</span>
-                    <Link href={`/edit-place/${place.id}`} className="flex items-center gap-1 text-sm bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 font-bold transition">
+                    <span className="font-bold text-blue-600" dir="ltr">
+                      {Number(place.price) > 0
+                        ? `${Number(place.price)} د.ج`
+                        : "مجاني"}
+                    </span>
+                    <Link
+                      href={`/edit-place/${place.id}`}
+                      className="flex items-center gap-1 text-sm bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 font-bold transition"
+                    >
                       <Edit2 size={14} /> تعديل
                     </Link>
                   </div>
