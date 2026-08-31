@@ -17,7 +17,7 @@ export default function TicketQRCode({
   dimmed?: boolean;
   onStatusChange?: (status: QRStatus) => void;
 }) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const canvasWrapRef = useRef<HTMLDivElement | null>(null);
   const [status, setStatus] = useState<QRStatus>("GENERATING");
   const [pngUrl, setPngUrl] = useState("");
   const verificationValue =
@@ -32,7 +32,7 @@ export default function TicketQRCode({
     const firstFrame = requestAnimationFrame(() => {
       const secondFrame = requestAnimationFrame(() => {
         try {
-          const canvas = canvasRef.current;
+          const canvas = canvasWrapRef.current?.querySelector("canvas") ?? null;
           if (!canvas) throw new Error("QR canvas is unavailable");
           const dataUrl = canvas.toDataURL("image/png", 1);
           const image = new Image();
@@ -71,11 +71,11 @@ export default function TicketQRCode({
       data-qr-status={status}
     >
       <div
+        ref={canvasWrapRef}
         className="pointer-events-none absolute -left-[9999px] top-0"
         aria-hidden="true"
       >
         <QRCodeCanvas
-          ref={canvasRef}
           value={verificationValue}
           size={512}
           level="H"
