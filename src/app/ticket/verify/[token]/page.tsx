@@ -6,7 +6,7 @@ import {
   ShieldCheck,
   TicketCheck,
 } from "lucide-react";
-import db from "@/lib/db";
+import { query } from "@/lib/db";
 import { extractTicketToken } from "@/lib/ticketToken";
 
 export const dynamic = "force-dynamic";
@@ -78,7 +78,7 @@ export default async function VerifyTicketPage({
     | undefined;
 
   try {
-    const modern = await db.query(
+    const modern = await query(
       `SELECT t."id", t."status", p."name" AS "placeName", p."location", p."eventEndsAt"
        FROM "Ticket" t
        JOIN "Booking" b ON b."id" = t."bookingId"
@@ -86,20 +86,20 @@ export default async function VerifyTicketPage({
        WHERE t."secureToken" = $1 LIMIT 1`,
       [token],
     );
-    result = modern.rows[0];
+    result = modern[0] as typeof result;
   } catch (error: any) {
     if (error?.code !== "42P01") throw error;
   }
 
   if (!result) {
-    const legacy = await db.query(
+    const legacy = await query(
       `SELECT b."id", b."status",
               p."name" AS "placeName", p."location", p."eventEndsAt"
        FROM "Booking" b JOIN "Place" p ON p."id" = b."placeId"
        WHERE b."qrToken" = $1 LIMIT 1`,
       [token],
     );
-    result = legacy.rows[0];
+    result = legacy[0] as typeof result;
   }
 
   const state = verificationState(result?.status);

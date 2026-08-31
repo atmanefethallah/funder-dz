@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
-import db from "@/lib/db";
+import { pool } from "@/lib/db";
 import { requireRole } from "@/lib/session";
 import { extractTicketToken } from "@/lib/ticketToken";
 
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       { status: 400 },
     );
 
-  const client = await db.connect();
+  const client = await pool.connect();
   try {
     await client.query("BEGIN");
 
