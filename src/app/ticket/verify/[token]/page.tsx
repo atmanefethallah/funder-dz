@@ -11,6 +11,14 @@ import { extractTicketToken } from "@/lib/ticketToken";
 
 export const dynamic = "force-dynamic";
 
+type TicketVerificationRow = {
+  id: string;
+  status: string;
+  placeName: string;
+  location: string;
+  eventEndsAt: Date | null;
+};
+
 function verificationState(status?: string | null) {
   if (!status)
     return {
@@ -67,18 +75,10 @@ export default async function VerifyTicketPage({
   params: { token: string };
 }) {
   const token = extractTicketToken(params.token);
-  let result:
-    | {
-        id: string;
-        status: string;
-        placeName: string;
-        location: string;
-        eventEndsAt: Date | null;
-      }
-    | undefined;
+  let result: TicketVerificationRow | undefined;
 
   try {
-    const modern = await query(
+    const modern = await query<TicketVerificationRow>(
       `SELECT t."id", t."status", p."name" AS "placeName", p."location", p."eventEndsAt"
        FROM "Ticket" t
        JOIN "Booking" b ON b."id" = t."bookingId"
@@ -86,20 +86,20 @@ export default async function VerifyTicketPage({
        WHERE t."secureToken" = $1 LIMIT 1`,
       [token],
     );
-    result = modern[0] as typeof result;
+    result = modern[0];
   } catch (error: any) {
     if (error?.code !== "42P01") throw error;
   }
 
   if (!result) {
-    const legacy = await query(
+    const legacy = await query<TicketVerificationRow>(
       `SELECT b."id", b."status",
               p."name" AS "placeName", p."location", p."eventEndsAt"
        FROM "Booking" b JOIN "Place" p ON p."id" = b."placeId"
        WHERE b."qrToken" = $1 LIMIT 1`,
       [token],
     );
-    result = legacy[0] as typeof result;
+    result = legacy[0];
   }
 
   const state = verificationState(result?.status);
