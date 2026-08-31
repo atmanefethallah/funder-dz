@@ -32,11 +32,40 @@ export type SaveableTicketData = {
   ticketType?: string | null;
 };
 
-export default function SaveableTicket({
-  ticket,
-}: {
-  ticket: SaveableTicketData;
-}) {
+export type LegacySaveableTicketProps = {
+  bookingId: string;
+  placeName: string;
+  status: string;
+  ticketsCount: number;
+  roomType: string | null;
+  qrToken: string;
+  mapsHref?: string | null;
+};
+
+type SaveableTicketProps =
+  | { ticket: SaveableTicketData }
+  | LegacySaveableTicketProps;
+
+export default function SaveableTicket(props: SaveableTicketProps) {
+  const ticket: SaveableTicketData =
+    "ticket" in props
+      ? props.ticket
+      : {
+          id: props.bookingId,
+          qrToken: props.qrToken,
+          status: props.status,
+          place: {
+            name: props.placeName,
+            location: "الموقع غير محدد",
+            image: "/icons/icon.svg",
+            category: props.roomType ? "فندق / إقامة" : "تذكرة Funder",
+          },
+          tickets: props.ticketsCount,
+          amount: 0,
+          createdAt: new Date().toISOString(),
+          userName: "مستخدم Funder",
+          ticketType: props.roomType,
+        };
   const ticketRef = useRef<HTMLDivElement>(null);
   const [qrStatus, setQrStatus] = useState<QRStatus>("GENERATING");
   const [isSaving, setIsSaving] = useState(false);
