@@ -20,6 +20,7 @@ type PartnerPlaceRow = {
   category: string;
   price: string;
   imageUrl: string | null;
+  itemType: string | null;
   bookings: Array<{ status: string }>;
   reviews: Array<{ rating: number }>;
 };
@@ -215,7 +216,13 @@ export default async function PartnerDashboardPage() {
                         : "مجاني"}
                     </span>
                     <Link
-                      href={`/edit-place/${place.id}`}
+                      href={
+                        place.itemType === "PROPERTY"
+                          ? `/partner-dashboard/properties/edit/${place.id}`
+                          : place.itemType === "EVENT"
+                            ? `/partner-dashboard/events/edit/${place.id}`
+                            : `/edit-place/${place.id}`
+                      }
                       className="flex items-center gap-1 text-sm bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-200 font-bold transition"
                     >
                       <Edit2 size={14} /> تعديل

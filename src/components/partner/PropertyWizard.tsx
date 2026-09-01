@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 type Plan = {
+  id?: string;
   name: string;
   price: string;
   mealPlan: string;
@@ -23,6 +24,7 @@ type Plan = {
   nonRefundable: boolean;
 };
 type Room = {
+  id?: string;
   name: string;
   description: string;
   totalUnits: string;
@@ -76,13 +78,20 @@ const steps = [
 ];
 const input =
   "w-full rounded-xl border border-gray-200 bg-white p-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100";
-export default function PropertyWizard() {
+export default function PropertyWizard({
+  editPlaceId,
+  initialData,
+}: {
+  editPlaceId?: string;
+  initialData?: { place: Record<string, any>; rooms: Room[] };
+} = {}) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [data, setData] = useState<any>({
-    name: "",
+    ...(initialData?.place || {}),
+    name: initialData?.place?.name ?? "",
     propertyType: "HOTEL",
     officialClassification: "",
     stars: "",
@@ -118,7 +127,11 @@ export default function PropertyWizard() {
     parkingPolicy: "",
     specialConditions: "",
   });
-  const [rooms, setRooms] = useState<Room[]>([emptyRoom()]);
+  const [rooms, setRooms] = useState<Room[]>(
+    initialData?.rooms && initialData.rooms.length > 0
+      ? initialData.rooms
+      : [emptyRoom()],
+  );
   const set = (k: string, v: any) => setData((d: any) => ({ ...d, [k]: v }));
   const updateRoom = (i: number, k: keyof Room, v: any) =>
     setRooms((r) => r.map((x, n) => (n === i ? { ...x, [k]: v } : x)));
@@ -153,14 +166,21 @@ export default function PropertyWizard() {
             .filter(Boolean),
         })),
       };
-      const res = await fetch("/api/partner/properties", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        editPlaceId
+          ? `/api/partner/properties/${editPlaceId}`
+          : "/api/partner/properties",
+        {
+          method: editPlaceId ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
+      );
       const out = await res.json();
       if (!res.ok) throw new Error(out.message);
-      router.push(`/places/${out.placeId}`);
+      router.push(
+        editPlaceId ? "/partner-dashboard" : `/places/${out.placeId}`,
+      );
       router.refresh();
     } catch (e: any) {
       setMessage(e.message || "تعذر الحفظ");
@@ -171,7 +191,9 @@ export default function PropertyWizard() {
   return (
     <main className="mx-auto max-w-5xl px-4 py-8" dir="rtl">
       <div className="mb-6 rounded-3xl bg-gradient-to-l from-blue-950 to-blue-700 p-6 text-white">
-        <h1 className="text-2xl font-black">إضافة فندق أو إقامة</h1>
+        <h1 className="text-2xl font-black">
+          {editPlaceId ? "تعديل الفندق أو الإقامة" : "إضافة فندق أو إقامة"}
+        </h1>
         <p className="mt-2 text-sm text-blue-100">
           السعر النهائي يأتي من الغرفة وخطة السعر والتوفر، وليس من سعر المعلم.
         </p>
@@ -683,7 +705,13 @@ export default function PropertyWizard() {
             disabled={loading}
             className="flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 font-black text-white disabled:opacity-50"
           >
-            {loading ? <Loader2 className="animate-spin" /> : "إنشاء المنشأة"}
+            {loading ? (
+              <Loader2 className="animate-spin" />
+            ) : editPlaceId ? (
+              "حفظ التعديلات"
+            ) : (
+              "إنشاء المنشأة"
+            )}
           </button>
         )}
       </div>

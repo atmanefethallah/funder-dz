@@ -5,6 +5,7 @@ import { CalendarDays, Loader2, Plus, Trash2 } from "lucide-react";
 const input =
   "w-full rounded-xl border border-gray-200 p-3 text-sm outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100";
 type TicketType = {
+  id?: string;
   name: string;
   description: string;
   price: string;
@@ -24,13 +25,20 @@ const emptyTicket = (): TicketType => ({
   saleStart: "",
   saleEnd: "",
 });
-export default function EventWizard() {
+export default function EventWizard({
+  editPlaceId,
+  initialData,
+}: {
+  editPlaceId?: string;
+  initialData?: { place: Record<string, any>; tickets: TicketType[] };
+} = {}) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [data, setData] = useState<any>({
-    name: "",
-    eventType: "CONCERT",
+    ...(initialData?.place || {}),
+    name: initialData?.place?.name ?? "",
+    eventType: initialData?.place?.eventType ?? "CONCERT",
     organizer: "",
     description: "",
     coverImageUrl: "",
@@ -50,7 +58,11 @@ export default function EventWizard() {
     attendanceTerms: "",
     capacity: "",
   });
-  const [tickets, setTickets] = useState<TicketType[]>([emptyTicket()]);
+  const [tickets, setTickets] = useState<TicketType[]>(
+    initialData?.tickets && initialData.tickets.length > 0
+      ? initialData.tickets
+      : [emptyTicket()],
+  );
   const set = (k: string, v: any) => setData((d: any) => ({ ...d, [k]: v }));
   const setTicket = (i: number, k: keyof TicketType, v: string) =>
     setTickets((t) => t.map((x, n) => (n === i ? { ...x, [k]: v } : x)));
@@ -58,14 +70,21 @@ export default function EventWizard() {
     setLoading(true);
     setMessage("");
     try {
-      const res = await fetch("/api/partner/events", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, ticketTypes: tickets }),
-      });
+      const res = await fetch(
+        editPlaceId
+          ? `/api/partner/events/${editPlaceId}`
+          : "/api/partner/events",
+        {
+          method: editPlaceId ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...data, ticketTypes: tickets }),
+        },
+      );
       const out = await res.json();
       if (!res.ok) throw new Error(out.message);
-      router.push(`/places/${out.placeId}`);
+      router.push(
+        editPlaceId ? "/partner-dashboard" : `/places/${out.placeId}`,
+      );
       router.refresh();
     } catch (e: any) {
       setMessage(e.message || "تعذر إنشاء الفعالية");
@@ -78,7 +97,7 @@ export default function EventWizard() {
       <div className="mb-6 rounded-3xl bg-gradient-to-l from-fuchsia-950 to-pink-600 p-6 text-white">
         <h1 className="flex items-center gap-2 text-2xl font-black">
           <CalendarDays />
-          إنشاء فعالية مؤقتة
+          {editPlaceId ? "تعديل الفعالية" : "إنشاء فعالية مؤقتة"}
         </h1>
         <p className="mt-2 text-sm text-pink-100">
           أضف الموعد والموقع وأنواع التذاكر والمخزون لكل نوع.
