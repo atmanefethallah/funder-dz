@@ -3,25 +3,99 @@ import { NextResponse } from "next/server";
 import { query, withTransaction } from "@/lib/db";
 import { requireRole } from "@/lib/session";
 import { recordLedger } from "@/lib/ledger";
+import {
+  computePromotionPrice,
+  settingsRowsToMap,
+  type PromotionPackageRow,
+} from "@/lib/promotionPricing";
+
 export const dynamic = "force-dynamic";
+
 export async function GET() {
   const user = await requireRole("PARTNER", "ADMIN");
   if (!user) return NextResponse.json({ message: "غير مصرح" }, { status: 403 });
-  const [places, packages, campaigns] = await Promise.all([
-    query(
-      `SELECT "id","name","category","eventEndsAt" FROM "Place" WHERE "userId"=$1 ORDER BY "createdAt" DESC`,
-      [user.id],
-    ),
-    query(
-      `SELECT "key","name","durationDays","reach","priority" FROM "PromotionPackage" WHERE "active"=true ORDER BY "durationDays"`,
-    ),
-    query(
-      `SELECT pr."id",pr."name",pr."status",pr."budget",pr."startAt",pr."endAt",p."name" AS "placeName" FROM "Promotion" pr JOIN "Place" p ON p."id"=pr."placeId" WHERE pr."partnerId"=$1 ORDER BY pr."createdAt" DESC LIMIT 50`,
-      [user.id],
-    ),
-  ]);
-  return NextResponse.json({ places, packages, campaigns });
+
+  const [places, packages, campaigns, settingsRows, wallet] = await Promise.all(
+    [
+      query<{
+        id: string;
+        name: string;
+        category: string;
+        imageUrl: string | null;
+        eventEndsAt: string | null;
+        isEvent: boolean | null;
+      }>(
+        `SELECT "id","name","category","imageUrl","eventEndsAt","isEvent" FROM "Place" WHERE "userId"=$1 ORDER BY "createdAt" DESC`,
+        [user.id],
+      ),
+      query<PromotionPackageRow>(
+        `SELECT "key","name","durationDays","reach","priority","basePrice" FROM "PromotionPackage" WHERE "active"=true ORDER BY "durationDays"`,
+      ),
+      query<{
+        id: string;
+        name: string;
+        status: string;
+        budget: string;
+        reservedAmount: string;
+        spentAmount: string;
+        startAt: string;
+        endAt: string;
+        reach: string;
+        priority: string;
+        rejectionReason: string | null;
+        createdAt: string;
+        placeName: string;
+        placeImage: string | null;
+        impressions: number;
+        clicks: number;
+        conversions: number;
+      }>(
+        `SELECT pr."id", pr."name", pr."status", pr."budget", pr."reservedAmount", pr."spentAmount",
+              pr."startAt", pr."endAt", pr."reach", pr."priority", pr."rejectionReason", pr."createdAt",
+              p."name" AS "placeName", p."imageUrl" AS "placeImage",
+              COALESCE(imp.cnt, 0) AS impressions,
+              COALESCE(clk.cnt, 0) AS clicks,
+              COALESCE(cv.cnt, 0) AS conversions
+       FROM "Promotion" pr
+       JOIN "Place" p ON p."id" = pr."placeId"
+       LEFT JOIN (SELECT "promotionId", COUNT(*)::int AS cnt FROM "PromotionImpression" GROUP BY "promotionId") imp ON imp."promotionId" = pr."id"
+       LEFT JOIN (SELECT "promotionId", COUNT(*)::int AS cnt FROM "PromotionClick" GROUP BY "promotionId") clk ON clk."promotionId" = pr."id"
+       LEFT JOIN (SELECT "promotionId", COUNT(*)::int AS cnt FROM "PromotionConversion" GROUP BY "promotionId") cv ON cv."promotionId" = pr."id"
+       WHERE pr."partnerId"=$1
+       ORDER BY pr."createdAt" DESC LIMIT 50`,
+        [user.id],
+      ),
+      query<{ key: string; value: unknown }>(
+        `SELECT "key","value" FROM "PromotionSetting" WHERE "key" IN ('durationPrices','reachMultipliers','priorityMultipliers')`,
+      ),
+      query<{ balance: string; reservedBalance: string }>(
+        `SELECT "balance","reservedBalance" FROM "User" WHERE "id"=$1`,
+        [user.id],
+      ),
+    ],
+  );
+
+  const settingsMap = settingsRowsToMap(settingsRows);
+  const pricedPackages = packages.map((pkg) => ({
+    ...pkg,
+    price: computePromotionPrice(pkg, settingsMap),
+  }));
+
+  const balance = Number(wallet[0]?.balance ?? 0);
+  const reservedBalance = Number(wallet[0]?.reservedBalance ?? 0);
+
+  return NextResponse.json({
+    places,
+    packages: pricedPackages,
+    campaigns,
+    wallet: {
+      balance,
+      reservedBalance,
+      available: Math.max(0, balance - reservedBalance),
+    },
+  });
 }
+
 export async function POST(req: Request) {
   const user = await requireRole("PARTNER", "ADMIN");
   if (!user) return NextResponse.json({ message: "غير مصرح" }, { status: 403 });
@@ -47,15 +121,8 @@ export async function POST(req: Request) {
       const settings = await tx.query(
         `SELECT "key","value" FROM "PromotionSetting" WHERE "key" IN ('durationPrices','reachMultipliers','priorityMultipliers')`,
       );
-      const map = Object.fromEntries(
-        settings.rows.map((x: any) => [x.key, x.value]),
-      );
-      const base = Number(
-        map.durationPrices?.[String(p.durationDays)] ?? p.basePrice,
-      );
-      const reach = Number(map.reachMultipliers?.[p.reach] ?? 1);
-      const priority = Number(map.priorityMultipliers?.[p.priority] ?? 1);
-      const budget = Math.round(base * reach * priority * 100) / 100;
+      const settingsMap = settingsRowsToMap(settings.rows);
+      const { total: budget } = computePromotionPrice(p, settingsMap);
       const start = new Date(b.startAt);
       const end = new Date(start);
       end.setUTCDate(end.getUTCDate() + Number(p.durationDays));
@@ -70,7 +137,7 @@ export async function POST(req: Request) {
         `UPDATE "User" SET "balance"="balance"-$1,"reservedBalance"="reservedBalance"+$1 WHERE "id"=$2 AND "balance">=$1 RETURNING "balance","reservedBalance"`,
         [budget, user.id],
       );
-      if (!debit.rows[0]) throw new Error("رصيد المحفظة غير كافٍ");
+      if (!debit.rows[0]) throw new Error("رصيد المحفظة غير كافِ");
       const id = randomUUID();
       await tx.query(
         `INSERT INTO "Promotion" ("id","partnerId","placeId","packageId","name","startAt","endAt","reach","priority","budget","reservedAmount","status") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$10,'PENDING_REVIEW')`,
